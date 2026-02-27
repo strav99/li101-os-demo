@@ -1,0 +1,2507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LI101 OS — Investor Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --navy:#0D2137;--navy-mid:#1a3552;--navy-light:#243f5e;
+  --coral:#E8715A;--coral-light:#f0907c;--coral-pale:#fdf1ee;
+  --offwhite:#f7f8fa;--gray-100:#f0f2f5;--gray-200:#e2e6eb;
+  --gray-400:#9aa5b4;--gray-600:#5a6a7a;--gray-800:#2d3748;
+  --green:#22c55e;--green-light:#dcfce7;
+  --amber:#f59e0b;--amber-light:#fef3c7;
+  --blue:#3b82f6;--blue-light:#dbeafe;
+  --purple:#8b5cf6;--purple-light:#f3e8ff;
+  --font-d:'DM Serif Display',Georgia,serif;
+  --font-b:'DM Sans',-apple-system,sans-serif;
+  --sh-sm:0 1px 3px rgba(13,33,55,.08),0 1px 2px rgba(13,33,55,.06);
+  --sh-md:0 4px 16px rgba(13,33,55,.10),0 2px 6px rgba(13,33,55,.07);
+  --r:12px;--rs:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-height:100vh;font-size:14px;line-height:1.5}
+
+/* NAV */
+.top-nav{background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.logo-mark{width:28px;height:28px;background:var(--coral);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:15px;height:15px;fill:white}
+.logo-text{font-family:var(--font-d);color:white;font-size:16px}
+.logo-text span{color:var(--coral)}
+.nav-badge{background:rgba(232,113,90,.18);color:var(--coral-light);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:20px;border:1px solid rgba(232,113,90,.3)}
+.view-switcher{display:flex;gap:4px}
+.view-btn{padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);font-family:var(--font-b);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.view-btn:hover{background:rgba(255,255,255,.08);color:white}
+.view-btn.active{background:var(--coral);border-color:var(--coral);color:white}
+
+/* SHELL */
+.app-shell{display:flex;min-height:calc(100vh - 56px);padding-bottom:64px}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--navy);padding:20px 0;flex-shrink:0;display:flex;flex-direction:column;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.sb-label{font-size:10px;font-weight:600;letter-spacing:1.1px;text-transform:uppercase;color:rgba(255,255,255,.28);padding:0 16px 6px;margin-top:18px}
+.sb-label:first-child{margin-top:0}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 16px;color:rgba(255,255,255,.58);cursor:pointer;font-size:13px;font-weight:400;transition:all .14s;border-left:3px solid transparent}
+.sb-item:hover{color:white;background:rgba(255,255,255,.05)}
+.sb-item.active{color:white;background:rgba(232,113,90,.12);border-left-color:var(--coral);font-weight:500}
+.sb-item svg{width:15px;height:15px;flex-shrink:0;opacity:.8}
+.agent-sel{padding:10px 14px;margin:0 10px 3px;border-radius:var(--rs);cursor:pointer;transition:all .14s;border:1px solid rgba(255,255,255,.07)}
+.agent-sel:hover{background:rgba(255,255,255,.07)}
+.agent-sel.selected{background:rgba(232,113,90,.14);border-color:rgba(232,113,90,.35)}
+.agent-name{color:white;font-weight:500;font-size:13px}
+.agent-meta{color:rgba(255,255,255,.4);font-size:11px;margin-top:1px}
+.client-pill{display:flex;align-items:center;gap:8px;padding:7px 14px;margin:0 10px 2px;border-radius:var(--rs);cursor:pointer;transition:all .14s}
+.client-pill:hover{background:rgba(255,255,255,.07)}
+.client-pill.selected{background:rgba(232,113,90,.14)}
+.ca{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0}
+.cpn{color:rgba(255,255,255,.75);font-size:13px}
+.client-pill.selected .cpn{color:white;font-weight:500}
+
+/* MAIN */
+.main{flex:1;padding:24px 28px;overflow-y:auto;min-width:0}
+
+/* PAGE HEADER */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px}
+.pt{font-family:var(--font-d);font-size:24px;color:var(--navy);letter-spacing:-.4px}
+.ps{color:var(--gray-600);font-size:12px;margin-top:3px}
+
+/* STAT CARDS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat{background:white;border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh-sm);border:1px solid var(--gray-200);position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--coral)}
+.s-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--gray-400);margin-bottom:7px}
+.s-val{font-family:var(--font-d);font-size:26px;color:var(--navy);letter-spacing:-.4px}
+.s-sub{font-size:11px;color:var(--gray-600);margin-top:3px}
+
+/* SECTION */
+.sec{margin-bottom:22px}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-size:14px;font-weight:600;color:var(--navy)}
+
+/* CARD */
+.card{background:white;border-radius:var(--r);box-shadow:var(--sh-sm);border:1px solid var(--gray-200);overflow:hidden}
+.card-hdr{padding:13px 18px;border-bottom:1px solid var(--gray-200);font-weight:600;font-size:13px;color:var(--navy);background:var(--offwhite);display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:18px}
+
+/* POLICY CARDS */
+.pol-grid{display:flex;flex-direction:column;gap:10px}
+.pol-card{background:white;border-radius:var(--r);padding:16px 20px;box-shadow:var(--sh-sm);border:1px solid var(--gray-200);display:grid;grid-template-columns:40px 1fr auto;gap:14px;align-items:start;transition:box-shadow .15s;cursor:pointer}
+.pol-card:hover{box-shadow:var(--sh-md)}
+.pol-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.pol-carrier{font-weight:600;font-size:13px}
+.pol-type{font-size:11px;color:var(--gray-600);margin-top:2px}
+.pol-meta{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap}
+.pmi .pmi-l{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400)}
+.pmi .pmi-v{font-size:12px;font-weight:500;color:var(--navy);margin-top:1px}
+.pmi .pmi-v.alert{color:var(--coral);font-weight:600}
+.pol-right{text-align:right}
+.db{font-family:var(--font-d);font-size:20px;color:var(--navy)}
+.db-l{font-size:10px;color:var(--gray-400);margin-top:1px}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;margin-top:6px}
+.s-active{background:var(--green-light);color:#166534}
+.s-pipeline{background:var(--amber-light);color:#92400e}
+.date-chip{display:inline-flex;align-items:center;background:var(--coral-pale);border:1px solid rgba(232,113,90,.2);color:var(--coral);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:500;margin-top:6px}
+
+/* BENE UNDER POLICY */
+.pol-bene-row{background:var(--offwhite);border-radius:0 0 var(--r) var(--r);border:1px solid var(--gray-200);border-top:none;padding:10px 20px 12px;margin-top:-2px;display:flex;gap:10px;flex-wrap:wrap}
+.bene-chip{display:inline-flex;align-items:center;gap:6px;background:white;border:1px solid var(--gray-200);border-radius:6px;padding:4px 10px;font-size:12px}
+.bene-chip-pct{font-weight:700;color:var(--coral);font-size:11px}
+
+/* POLICY SUMMARY TABLE */
+.pol-table{width:100%;border-collapse:collapse}
+.pol-table th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);padding:10px 14px;text-align:left;background:var(--offwhite);border-bottom:1px solid var(--gray-200)}
+.pol-table td{padding:11px 14px;border-bottom:1px solid var(--gray-100);font-size:12px;color:var(--gray-800)}
+.pol-table tr:last-child td{border-bottom:none}
+.pol-table tbody tr:hover td{background:var(--offwhite)}
+.pol-table td strong{color:var(--navy)}
+.expire-soon{color:var(--coral)!important;font-weight:600!important}
+
+/* TAGS */
+.tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
+.tag-term{background:var(--blue-light);color:#1d4ed8}
+.tag-whole{background:var(--green-light);color:#166534}
+.tag-univ{background:var(--purple-light);color:#7c3aed}
+.tag-prem{background:var(--amber-light);color:#92400e}
+
+/* AGG BENE */
+.agg-hero{background:var(--navy);border-radius:var(--r);padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.agg-hero::after{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(232,113,90,.2) 0%,transparent 70%);border-radius:50%}
+.agg-title{font-family:var(--font-d);color:white;font-size:20px;margin-bottom:4px}
+.agg-sub{color:rgba(255,255,255,.5);font-size:12px;margin-bottom:18px}
+.agg-total{font-family:var(--font-d);color:var(--coral);font-size:38px}
+.agg-total-l{color:rgba(255,255,255,.55);font-size:12px;margin-top:3px}
+.agg-bene-card{background:white;border-radius:var(--r);box-shadow:var(--sh-sm);border:1px solid var(--gray-200);margin-bottom:10px;overflow:hidden}
+.agg-bene-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;transition:background .13s}
+.agg-bene-hdr:hover{background:var(--offwhite)}
+.agg-bene-name{font-weight:600;font-size:13px}
+.agg-bene-rel{font-size:11px;color:var(--gray-400);margin-top:1px}
+.agg-bene-amt{font-family:var(--font-d);font-size:20px}
+.agg-bene-pct{font-size:11px;color:var(--gray-400);text-align:right;margin-top:1px}
+.exp-ico{color:var(--gray-400);font-size:16px;transition:transform .2s;margin-left:12px}
+.agg-bene-hdr.open .exp-ico{transform:rotate(180deg)}
+.agg-breakdown{display:none;padding:0 18px 14px;border-top:1px solid var(--gray-100)}
+.agg-breakdown.open{display:block}
+.bd-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--gray-100);font-size:12px}
+.bd-row:last-child{border-bottom:none}
+.bd-policy{color:var(--gray-800)}
+.bd-carrier{color:var(--gray-400);font-size:10px}
+.bd-amt{font-weight:600;color:var(--navy)}
+
+/* LOOKUP */
+.lookup-input{width:100%;padding:11px 16px;border:1.5px solid var(--gray-200);border-radius:var(--r);font-family:var(--font-b);font-size:13px;color:var(--navy);background:white;box-shadow:var(--sh-sm);outline:none;transition:border-color .14s;margin-bottom:18px}
+.lookup-input:focus{border-color:var(--coral)}
+.lookup-input::placeholder{color:var(--gray-400)}
+.lu-result{background:white;border-radius:var(--r);box-shadow:var(--sh-sm);border:1px solid var(--gray-200);margin-bottom:10px;overflow:hidden}
+.lu-hdr{display:flex;align-items:center;gap:10px;padding:12px 18px;background:var(--offwhite);border-bottom:1px solid var(--gray-200)}
+.lu-name{font-weight:600;font-size:13px}
+.lu-agent{font-size:11px;color:var(--gray-400);margin-left:auto}
+.lc-badge{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;padding:2px 7px;border-radius:4px}
+.lc-client{background:var(--blue-light);color:#1d4ed8}
+.lc-lead{background:var(--amber-light);color:#92400e}
+
+/* DATA TABLE */
+.dt{width:100%;border-collapse:collapse;background:white;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh-sm);border:1px solid var(--gray-200)}
+.dt th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);padding:11px 14px;text-align:left;background:var(--offwhite);border-bottom:1px solid var(--gray-200)}
+.dt td{padding:12px 14px;border-bottom:1px solid var(--gray-100);font-size:12px}
+.dt tr:last-child td{border-bottom:none}
+.dt tbody tr{cursor:pointer;transition:background .11s}
+.dt tbody tr:hover td{background:var(--offwhite)}
+
+/* COMMISSION PANEL */
+.comm-wide{background:var(--navy);border-radius:var(--r);padding:20px 28px;display:grid;grid-template-columns:1fr 1fr 1fr 2px 1fr;gap:0;align-items:center;box-shadow:var(--sh-md)}
+.comm-div{background:rgba(255,255,255,.12);height:50px;width:1px;justify-self:center}
+.comm-item{padding:0 20px}
+.comm-item:first-child{padding-left:0}
+.comm-l{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:rgba(255,255,255,.4);margin-bottom:5px}
+.comm-v{font-family:var(--font-d);font-size:22px;color:white}
+.comm-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:2px}
+.comm-trend{font-size:11px;font-weight:600;color:var(--green);margin-top:2px}
+
+/* FIXED SUMMARY BAR */
+.summary-bar{position:fixed;bottom:0;left:0;right:0;height:56px;background:var(--navy-mid);border-top:1px solid rgba(255,255,255,.1);display:flex;align-items:center;padding:0 28px;gap:0;z-index:150;box-shadow:0 -4px 20px rgba(0,0,0,.15)}
+.sb-stat{display:flex;flex-direction:column;padding:0 24px;border-right:1px solid rgba(255,255,255,.1)}
+.sb-stat:first-child{padding-left:0}
+.sb-stat:last-child{border-right:none}
+.sbs-l{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4)}
+.sbs-v{font-size:14px;font-weight:600;color:white;margin-top:1px}
+.sbs-v.coral{color:var(--coral)}
+.sb-spacer{flex:1}
+.sb-label-tag{font-size:10px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-right:8px}
+
+/* OVERVIEW GRID */
+.ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.client-list-rows .cl-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .11s}
+.cl-row:last-child{border-bottom:none}
+.cl-row:hover{background:var(--offwhite)}
+.cl-name{font-weight:500;font-size:13px}
+.cl-meta{font-size:10px;color:var(--gray-400);margin-top:1px}
+.cl-amt{font-family:var(--font-d);font-size:15px;margin-left:auto}
+
+/* PROSPECTS */
+.prospect-card{background:white;border-radius:var(--r);padding:16px 20px;box-shadow:var(--sh-sm);border:1px solid var(--gray-200);display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s}
+.prospect-card:hover{box-shadow:var(--sh-md)}
+.prospect-avatar{width:36px;height:36px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0}
+.prospect-name{font-weight:600;font-size:13px}
+.prospect-meta{font-size:11px;color:var(--gray-600);margin-top:2px}
+.prospect-db{font-family:var(--font-d);font-size:18px;text-align:right}
+.prospect-carrier{font-size:10px;color:var(--gray-400);text-align:right;margin-top:2px}
+
+/* FINANCE */
+.pf-hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%);border-radius:var(--r);padding:20px 24px;color:white;margin-bottom:14px;display:flex;gap:20px;align-items:center}
+.pf-type{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--coral)}
+.pf-db{font-family:var(--font-d);font-size:28px}
+.pf-carrier{color:rgba(255,255,255,.55);font-size:12px}
+.pf-div{width:1px;background:rgba(255,255,255,.12);align-self:stretch}
+.pf-s .pf-sl{font-size:9px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:.6px;text-transform:uppercase}
+.pf-s .pf-sv{font-size:15px;font-weight:600;color:white;margin-top:2px}
+.case-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cf .cf-l{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);margin-bottom:3px}
+.cf .cf-v{font-size:13px;font-weight:500;color:var(--navy)}
+.stress-badge{display:inline-flex;align-items:center;gap:6px;background:var(--amber-light);color:#92400e;padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600}
+
+/* BTN */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--rs);font-family:var(--font-b);font-size:12px;font-weight:500;border:none;cursor:pointer;transition:all .14s}
+.btn-primary{background:var(--coral);color:white}
+.btn-primary:hover{background:var(--coral-light)}
+.btn-outline{background:transparent;border:1.5px solid var(--gray-200);color:var(--navy)}
+.btn-outline:hover{border-color:var(--navy)}
+
+/* SCREENS */
+.screen{display:none}
+.screen.active{display:block;animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* SHARE BAR */
+.share-bar-wrap{display:flex;align-items:center;gap:8px}
+.share-bar{height:5px;border-radius:3px;background:var(--gray-200);flex:1;overflow:hidden}
+.share-fill{height:100%;border-radius:3px;background:var(--coral)}
+.share-pct{font-weight:600;color:var(--navy);font-size:12px;min-width:32px;text-align:right}
+
+/* BELL / NOTIFICATIONS */
+.bell-wrap{position:relative;cursor:pointer;display:flex;align-items:center;margin-right:10px}
+.bell-wrap svg{width:22px;height:22px;fill:rgba(255,255,255,.7);transition:fill .15s}
+.bell-wrap:hover svg{fill:white}
+.bell-badge{position:absolute;top:-4px;right:-4px;background:var(--coral);color:white;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy)}
+.notif-dropdown{position:absolute;top:48px;right:0;width:360px;background:white;border-radius:var(--r);box-shadow:0 8px 40px rgba(0,0,0,.22);z-index:500;display:none;overflow:hidden}
+.notif-dropdown.open{display:block;animation:fadeIn .15s ease}
+.notif-hdr{background:var(--navy);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.notif-hdr-t{color:white;font-weight:600;font-size:13px}
+.notif-hdr-clr{color:var(--coral-light);font-size:11px;cursor:pointer}
+.notif-item{display:flex;gap:10px;padding:10px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .1s}
+.notif-item:hover{background:var(--offwhite)}
+.notif-item.unread{background:#fdf6f4}
+.notif-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:1px}
+.notif-body{flex:1}
+.notif-title{font-size:12px;font-weight:600;color:var(--navy)}
+.notif-sub{font-size:11px;color:var(--gray-600);margin-top:1px;line-height:1.4}
+.notif-time{font-size:10px;color:var(--gray-400);margin-top:3px}
+.notif-dot{width:7px;height:7px;border-radius:50%;background:var(--coral);flex-shrink:0;margin-top:6px}
+
+/* ACTIVITY FEED */
+.feed-item{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--gray-100);font-size:12px}
+.feed-item:last-child{border-bottom:none}
+.feed-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(13,33,55,.6);z-index:600;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.modal-overlay.hidden{display:none}
+.modal-box{background:white;border-radius:16px;width:520px;max-width:95vw;box-shadow:0 20px 80px rgba(0,0,0,.3);overflow:hidden;animation:modalIn .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-hdr{background:var(--navy);padding:20px 24px;display:flex;justify-content:space-between;align-items:center}
+.modal-title{color:white;font-family:var(--font-d);font-size:20px}
+.modal-close{color:rgba(255,255,255,.5);font-size:20px;cursor:pointer;line-height:1;background:none;border:none;padding:0}
+.modal-close:hover{color:white}
+.modal-body{padding:24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--gray-100);display:flex;gap:10px;justify-content:flex-end}
+
+/* CONFETTI */
+.confetti-piece{position:fixed;width:10px;height:10px;border-radius:2px;pointer-events:none;z-index:700;animation:confettiFall linear forwards}
+@keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* SUCCESS TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:white;padding:14px 20px;border-radius:var(--r);box-shadow:var(--sh-md);z-index:800;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;animation:toastIn .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <a class="logo" href="#">
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
+    <span class="logo-text">LI<span>101</span> OS</span>
+  </a>
+  <div class="view-switcher">
+    <button class="view-btn active" onclick="switchView('agent')">⚡ Agent View</button>
+    <button class="view-btn" onclick="switchView('client')">👤 Client View</button>
+    <button class="view-btn" onclick="switchView('god')" style="border-color:rgba(139,92,246,.5)">👁 God View</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:4px">
+    <div class="bell-wrap" onclick="toggleNotifications(event)" id="bell-wrap">
+      <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+      <div class="bell-badge" id="bell-badge">7</div>
+    </div>
+    <div class="notif-dropdown" id="notif-dropdown">
+      <div class="notif-hdr"><span class="notif-hdr-t">🔔 Notifications</span><span class="notif-hdr-clr" onclick="clearNotifications()">Mark all read</span></div>
+      <div id="notif-list"></div>
+    </div>
+    <span class="nav-badge">Investor Demo</span>
+  </div>
+</nav>
+
+<!-- CONVERSION MODAL -->
+<div class="modal-overlay hidden" id="conv-modal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <span class="modal-title" id="conv-modal-title">Convert to Client</span>
+      <button class="modal-close" onclick="closeConvModal()">✕</button>
+    </div>
+    <div class="modal-body" id="conv-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeConvModal()">Cancel</button>
+      <button class="btn btn-primary" id="conv-confirm-btn" onclick="confirmConversion()">🎉 Confirm & Convert</button>
+    </div>
+  </div>
+</div>
+
+<div class="app-shell">
+
+<!-- ══════════ AGENT SIDEBAR ══════════ -->
+<div class="sidebar" id="agent-sidebar">
+  <div class="sb-label">Producers</div>
+  <div class="agent-sel selected" onclick="selectAgent('scott')" id="asel-scott">
+    <div class="agent-name">Scott Travasos</div>
+    <div class="agent-meta">Encinitas · 4 clients</div>
+  </div>
+  <div class="agent-sel" onclick="selectAgent('anthony')" id="asel-anthony">
+    <div class="agent-name">Anthony Mazzei</div>
+    <div class="agent-meta">Del Mar · 4 clients</div>
+  </div>
+  <div class="agent-sel" onclick="selectAgent('rainmaker')" id="asel-rainmaker">
+    <div class="agent-name">Rain Maker</div>
+    <div class="agent-meta">La Jolla · 4 clients</div>
+  </div>
+  <div class="sb-label">Navigation</div>
+  <div class="sb-item active" onclick="agentNav('overview')" id="anav-overview">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+    Dashboard
+  </div>
+  <div class="sb-item" onclick="agentNav('clients')" id="anav-clients">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+    My Clients
+  </div>
+  <div class="sb-item" onclick="agentNav('prospects')" id="anav-prospects">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+    My Prospects
+  </div>
+  <div class="sb-item" onclick="agentNav('lookup')" id="anav-lookup">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    Universal Lookup
+  </div>
+  <div class="sb-item" onclick="agentNav('finance')" id="anav-finance">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+    Premium Finance
+  </div>
+  <div class="sb-item" onclick="agentNav('licensing')" id="anav-licensing">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+    Licensing
+  </div>
+</div>
+
+<!-- ══════════ GOD VIEW SIDEBAR ══════════ -->
+<div class="sidebar" id="god-sidebar" style="display:none">
+  <div class="sb-label">Executive View</div>
+  <div class="sb-item active" onclick="godNav('dashboard')" id="gnav-dashboard">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+    Company Dashboard
+  </div>
+  <div class="sb-item" onclick="godNav('sales')" id="gnav-sales">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99l1.5 1.5z"/></svg>
+    Sales Analytics
+  </div>
+  <div class="sb-item" onclick="godNav('agentperf')" id="gnav-agentperf">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+    Agent Performance
+  </div>
+  <div class="sb-item" onclick="godNav('financial')" id="gnav-financial">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+    Financial Dashboard
+  </div>
+</div>
+
+<!-- ══════════ CLIENT SIDEBAR ══════════ -->
+<div class="sidebar" id="client-sidebar" style="display:none">
+  <div class="sb-label">Select Client</div>
+  <div class="client-pill selected" onclick="selectClient('ironman')" id="cpill-ironman"><div class="ca" style="background:#c0392b">IM</div><span class="cpn">Iron Man</span></div>
+  <div class="client-pill" onclick="selectClient('spiderman')" id="cpill-spiderman"><div class="ca" style="background:#e67e22">SP</div><span class="cpn">SpiderMan</span></div>
+  <div class="client-pill" onclick="selectClient('superman')" id="cpill-superman"><div class="ca" style="background:#2980b9">SM</div><span class="cpn">SuperMan</span></div>
+  <div class="client-pill" onclick="selectClient('wonderwoman')" id="cpill-wonderwoman"><div class="ca" style="background:#8e44ad">WW</div><span class="cpn">Wonder Woman</span></div>
+  <div class="client-pill" onclick="selectClient('batman')" id="cpill-batman"><div class="ca" style="background:#2c3e50">BA</div><span class="cpn">Batman</span></div>
+  <div class="client-pill" onclick="selectClient('hulk')" id="cpill-hulk"><div class="ca" style="background:#27ae60">HK</div><span class="cpn">Hulk</span></div>
+  <div class="client-pill" onclick="selectClient('wolverine')" id="cpill-wolverine"><div class="ca" style="background:#d4a017">WO</div><span class="cpn">Wolverine</span></div>
+  <div class="client-pill" onclick="selectClient('thor')" id="cpill-thor"><div class="ca" style="background:#e8715a">TH</div><span class="cpn">Thor</span></div>
+  <div class="client-pill" onclick="selectClient('seinfeld')" id="cpill-seinfeld"><div class="ca" style="background:#0891b2">JS</div><span class="cpn">Jerry Seinfeld</span></div>
+  <div class="client-pill" onclick="selectClient('taylor')" id="cpill-taylor"><div class="ca" style="background:#059669">CT</div><span class="cpn">Coach Taylor</span></div>
+  <div class="client-pill" onclick="selectClient('rachel')" id="cpill-rachel"><div class="ca" style="background:#db2777">RG</div><span class="cpn">Rachel Green</span></div>
+  <div class="client-pill" onclick="selectClient('sydney')" id="cpill-sydney"><div class="ca" style="background:#7c3aed">SB</div><span class="cpn">Sydney Bristow</span></div>
+  <div class="sb-label">Portal</div>
+  <div class="sb-item active" id="cnav-policies" onclick="clientNav('policies')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+    My Policies
+  </div>
+  <div class="sb-item" id="cnav-beneficiaries" onclick="clientNav('beneficiaries')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+    Who Gets What
+  </div>
+  <div class="sb-item" id="cnav-trust" onclick="clientNav('trust')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93-2.67-1.14-5-4.43-5-7.93V7.18L12 5z"/></svg>
+    Trust Integration
+  </div>
+</div>
+
+<!-- ══════════ MAIN CONTENT ══════════ -->
+<div class="main">
+
+<!-- AGENT: OVERVIEW -->
+<div class="screen" id="screen-agent-overview">
+  <div class="ph">
+    <div><div class="pt" id="ov-title">Good morning — Scott Travasos</div><div class="ps" id="ov-sub">4 clients · 4 prospects · Encinitas, CA</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+      <button class="btn btn-primary" onclick="agentNav('lookup')">🔍 Universal Lookup</button>
+      <button class="btn" style="background:var(--blue);color:white;border:none" onclick="agentNav('equity')">📊 Equity Tracker</button>
+    </div>
+  </div>
+  <div class="stats" id="ov-stats"></div>
+  <div style="margin-bottom:20px">
+    <div class="sec-hdr"><span class="sec-title">Commission Summary</span></div>
+    <div id="ov-comm-wrap"></div>
+  </div>
+  <div class="ov-grid">
+    <div>
+      <div class="sec-hdr"><span class="sec-title">My Clients</span><button class="btn btn-outline" onclick="agentNav('clients')">View all →</button></div>
+      <div class="card"><div class="card-hdr"><span>Assigned Clients</span><span id="ov-client-count" style="background:var(--coral);color:white;border-radius:20px;padding:1px 8px;font-size:10px;font-weight:700;">4</span></div>
+        <div class="client-list-rows" id="ov-client-rows"></div>
+      </div>
+    </div>
+    <div>
+      <div class="sec-hdr"><span class="sec-title">Policy Mix</span></div>
+      <div class="card"><div class="card-body" id="ov-mix" style="display:flex;flex-direction:column;gap:10px"></div></div>
+      <div class="sec-hdr" style="margin-top:16px"><span class="sec-title">Conversion Alerts</span></div>
+      <div class="card"><div class="card-body" id="ov-alerts"></div></div>
+      <div class="sec-hdr" style="margin-top:16px"><span class="sec-title">⚡ Activity Feed</span><span style="font-size:10px;color:var(--green)">● Live</span></div>
+      <div class="card" style="padding:0;overflow:hidden"><div id="ov-feed"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- AGENT: MY CLIENTS -->
+<div class="screen" id="screen-agent-clients">
+  <div class="ph"><div><div class="pt" id="cl-title">My Clients</div><div class="ps">In-force book of business</div></div></div>
+  <table class="dt" id="cl-table">
+    <thead><tr><th>Client</th><th>Policies</th><th>Total Coverage</th><th>Monthly Premium</th><th>Nearest Expiry</th><th>Next Payment Due</th><th>Commission to Date</th><th>Status</th></tr></thead>
+    <tbody id="cl-tbody"></tbody>
+    <tfoot id="cl-tfoot"></tfoot>
+  </table>
+</div>
+
+<!-- AGENT: PROSPECTS -->
+<div class="screen" id="screen-agent-prospects">
+  <div class="ph"><div><div class="pt" id="pr-title">My Prospects</div><div class="ps">Pipeline — proposed policies pending placement</div></div></div>
+  <div id="pr-aggregator"></div>
+  <div id="pr-cards"></div>
+</div>
+
+<!-- AGENT: LOOKUP -->
+<div class="screen" id="screen-agent-lookup">
+  <div class="ph"><div><div class="pt">Universal Lookup</div><div class="ps">Search all clients and leads — policy summaries only</div></div></div>
+  <input class="lookup-input" id="lu-input" type="text" placeholder="Type any name — searches clients and prospects…" oninput="runLookup(this.value)">
+  <div id="lu-results"></div>
+  <div id="lu-placeholder" style="text-align:center;padding:48px 20px;color:var(--gray-400)">
+    <div style="font-size:36px;margin-bottom:10px">🔍</div>
+    <p style="font-size:13px">Start typing to search across clients and prospects</p>
+    <p style="font-size:11px;margin-top:4px">Shows term end dates and conversion deadlines prominently</p>
+  </div>
+</div>
+
+<!-- AGENT: PREMIUM FINANCE -->
+<div class="screen" id="screen-agent-finance">
+  <div class="ph"><div><div class="pt">Premium Finance Cases</div><div class="ps">PPLI and ILIT structures — full case detail</div></div></div>
+  <div id="finance-content"></div>
+</div>
+
+<!-- AGENT: LICENSING -->
+<div class="screen" id="screen-agent-licensing">
+  <div class="ph"><div><div class="pt" id="lic-title">Licensing</div><div class="ps">Agent licenses, CE credits, and carrier appointments</div></div></div>
+  <div id="lic-content"></div>
+</div>
+
+<!-- GOD VIEW SCREENS -->
+<div class="screen" id="screen-god-dashboard">
+  <div class="ph"><div><div class="pt">Company Dashboard</div><div class="ps">LI101 OS · Real-time executive overview · 27 locations · 54 agents</div></div>
+    <div style="background:var(--purple-light);color:var(--purple);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--purple)">👁 GOD VIEW</div>
+  </div>
+  <div id="god-dashboard-content"></div>
+</div>
+<div class="screen" id="screen-god-sales">
+  <div class="ph"><div><div class="pt">Sales Analytics</div><div class="ps">Company-wide sales performance · charts · location breakdown</div></div>
+    <div style="background:var(--purple-light);color:var(--purple);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--purple)">👁 GOD VIEW</div>
+  </div>
+  <div id="god-sales-content"></div>
+</div>
+<div class="screen" id="screen-god-agentperf">
+  <div class="ph"><div><div class="pt">Agent Performance</div><div class="ps">Top performers · bottom performers · turnover · rankings</div></div>
+    <div style="background:var(--purple-light);color:var(--purple);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--purple)">👁 GOD VIEW</div>
+  </div>
+  <div id="god-agents-content"></div>
+</div>
+<div class="screen" id="screen-god-financial">
+  <div class="ph"><div><div class="pt">Financial Dashboard</div><div class="ps">Revenue · growth rates · product mix · projections</div></div>
+    <div style="background:var(--purple-light);color:var(--purple);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid var(--purple)">👁 GOD VIEW</div>
+  </div>
+  <div id="god-financial-content"></div>
+</div>
+
+<!-- AGENT: EQUITY TRACKER -->
+<div class="screen" id="screen-agent-equity">
+  <div class="ph"><div><div class="pt" id="eq-title">Equity Tracker</div><div class="ps" id="eq-sub">Your ownership stake in LI101 OS</div></div></div>
+  <div id="eq-content"></div>
+</div>
+
+<!-- CLIENT: POLICIES -->
+<div class="screen" id="screen-client-policies">
+  <div class="ph">
+    <div><div class="pt" id="cp-title">My Policies</div><div class="ps" id="cp-sub">All your life insurance in one place</div></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div id="cp-agent-card"></div>
+      <button class="btn" style="background:var(--navy);color:white;border:1.5px solid rgba(255,255,255,.15);gap:7px" onclick="clientNav('trust')">
+        🛡️ Trust Integration
+      </button>
+    </div>
+  </div>
+  <div class="stats" id="cp-stats"></div>
+  <div class="sec"><div class="sec-hdr"><span class="sec-title">Active Policies</span></div>
+    <div class="pol-grid" id="cp-cards"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-hdr"><span class="sec-title">Policy Summary Table</span></div>
+    <div class="card"><table class="pol-table" id="cp-table">
+      <thead><tr><th>Carrier</th><th>Type</th><th>Death Benefit</th><th>Premium</th><th>Next Payment</th><th>Policy End Date</th><th>Conversion Deadline</th><th>Cash Value (est.)</th><th>Status</th></tr></thead>
+      <tbody id="cp-tbody"></tbody>
+      <tfoot id="cp-tfoot"></tfoot>
+    </table></div>
+  </div>
+  <div class="sec" id="cp-bene-summary"></div>
+</div>
+
+<!-- CLIENT: WHO GETS WHAT -->
+<div class="screen" id="screen-client-beneficiaries">
+  <div class="ph"><div><div class="pt">Who Gets What If I Die?</div><div class="ps" id="bene-sub">Aggregated across all active policies</div></div>
+    <button class="btn" style="background:var(--navy);color:white;border:1.5px solid rgba(255,255,255,.15)" onclick="clientNav('trust')">🛡️ Trust Integration</button>
+  </div>
+  <div class="agg-hero">
+    <div>
+      <div class="agg-title">Total Estate Protection</div>
+      <div class="agg-sub" id="agg-sub">Loading…</div>
+      <div class="agg-total" id="agg-total">—</div>
+      <div class="agg-total-l">Combined death benefit</div>
+    </div>
+  </div>
+  <div class="sec"><div class="sec-hdr"><span class="sec-title">Payout by Beneficiary</span></div>
+    <div id="agg-cards"></div>
+  </div>
+</div>
+
+<!-- CLIENT: TRUST INTEGRATION -->
+<div class="screen" id="screen-client-trust">
+  <div class="ph">
+    <div><div class="pt" id="tr-title">Trust Integration</div><div class="ps" id="tr-sub">Trust structure, asset schedule, and key documents</div></div>
+    <div id="tr-agent-card"></div>
+  </div>
+  <div id="tr-content"></div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /app-shell -->
+
+<!-- FIXED SUMMARY BAR -->
+<div class="summary-bar" id="summary-bar"></div>
+
+<script>
+// ═══════════ DATA ═══════════
+const D = {
+  agents: {
+    scott: { name:'Scott Travasos', clients:['ironman','spiderman','superman','thor'], prospects:['hansolo','r2d2','c3po','leia'],
+      equity:{
+        grantDate:'March 1, 2022', vestingStart:'March 1, 2022',
+        totalShares:50000, totalPct:0.5,
+        vestedPct:25, vestedShares:12500,
+        unvestedShares:37500,
+        valuation409a:5.00,
+        vestedValue:62500, totalValue:250000,
+        schedule:[
+          { date:'Mar 2025', shares:12500, pct:25, done:true },
+          { date:'Mar 2026', shares:12500, pct:25, done:false },
+          { date:'Mar 2027', shares:12500, pct:25, done:false },
+          { date:'Mar 2028', shares:12500, pct:25, done:false },
+        ],
+        policiesSold:78, clubTarget:100,
+        bonusGrant:0.1, bonusValue:50000,
+        rank:3, totalAgents:54,
+        exitScenarios:[
+          { label:'$500M Acquisition', value:2500000, multiple:'10x' },
+          { label:'$1B IPO',           value:5000000, multiple:'20x' },
+          { label:'$250M Strategic',   value:1250000, multiple:'5x'  },
+        ]
+      }
+    },
+    anthony: { name:'Anthony Mazzei', clients:['wonderwoman','batman','hulk','wolverine'], prospects:['luke','chewie','yoda','obiwan'],
+      equity:{
+        grantDate:'July 15, 2021', vestingStart:'July 15, 2021',
+        totalShares:65000, totalPct:0.65,
+        vestedPct:40, vestedShares:26000,
+        unvestedShares:39000,
+        valuation409a:5.00,
+        vestedValue:130000, totalValue:325000,
+        schedule:[
+          { date:'Jul 2022', shares:16250, pct:25, done:true },
+          { date:'Jul 2023', shares:16250, pct:25, done:true },
+          { date:'Jul 2024', shares:6500,  pct:10, done:true },
+          { date:'Jul 2025', shares:13000, pct:20, done:false },
+          { date:'Jul 2026', shares:13000, pct:20, done:false },
+        ],
+        policiesSold:91, clubTarget:100,
+        bonusGrant:0.1, bonusValue:50000,
+        rank:1, totalAgents:54,
+        exitScenarios:[
+          { label:'$500M Acquisition', value:3250000, multiple:'10x' },
+          { label:'$1B IPO',           value:6500000, multiple:'20x' },
+          { label:'$250M Strategic',   value:1625000, multiple:'5x'  },
+        ]
+      }
+    },
+    rainmaker: { name:'Rain Maker', clients:['seinfeld','taylor','rachel','sydney'], prospects:['kylo','poe','anakin','padme'],
+      equity:{
+        grantDate:'January 10, 2023', vestingStart:'January 10, 2023',
+        totalShares:40000, totalPct:0.4,
+        vestedPct:15, vestedShares:6000,
+        unvestedShares:34000,
+        valuation409a:5.00,
+        vestedValue:30000, totalValue:200000,
+        schedule:[
+          { date:'Jan 2024', shares:10000, pct:25, done:true },
+          { date:'Jan 2025', shares:4000,  pct:10, done:false },
+          { date:'Jan 2026', shares:13000, pct:32, done:false },
+          { date:'Jan 2027', shares:13000, pct:33, done:false },
+        ],
+        policiesSold:62, clubTarget:100,
+        bonusGrant:0.1, bonusValue:50000,
+        rank:7, totalAgents:54,
+        exitScenarios:[
+          { label:'$500M Acquisition', value:2000000, multiple:'10x' },
+          { label:'$1B IPO',           value:4000000, multiple:'20x' },
+          { label:'$250M Strategic',   value:1000000, multiple:'5x'  },
+        ]
+      }
+    }
+  },
+  trusts: {
+    ironman:     { name:'Iron Man Irrevocable Trust', formed:'February 26, 2019', lastAmended:'March 15, 2024', certOnFile:true, attorney:'SoCal Coast Trust · Ari Gold, Esq.',
+      assets:[
+        { cat:'Real Estate',   desc:'Stark Tower — New York, NY',         titleName:'Iron Man',                       matches:false },
+        { cat:'Real Estate',   desc:'Malibu Residence — Malibu, CA',      titleName:'Iron Man Irrevocable Trust',     matches:true  },
+        { cat:'Bank',          desc:'Bank of America — Checking',         titleName:'Iron Man',                       matches:false },
+        { cat:'Bank',          desc:'JPMorgan Chase — Operating Account', titleName:'Iron Man Irrevocable Trust',     matches:true  },
+        { cat:'Investment',    desc:'Fidelity Brokerage — Taxable',       titleName:'Iron Man',                       matches:false },
+        { cat:'Investment',    desc:'Schwab — Joint Investment Account',  titleName:'Iron Man Irrevocable Trust',     matches:true  },
+        { cat:'Business',      desc:'Stark Industries LLC',               titleName:'Iron Man Irrevocable Trust',     matches:true  },
+        { cat:'Business',      desc:'Stark R&D Partners LP',              titleName:'Iron Man',                       matches:false },
+        { cat:'Retirement',    desc:'Fidelity 401(k)',                    titleName:'Iron Man',                       matches:false },
+        { cat:'Life Insurance',desc:'Prudential Term — POL002',           titleName:'Iron Man Irrevocable Trust',     matches:true  },
+        { cat:'Life Insurance',desc:'Guardian Whole Life — POL003',       titleName:'Iron Man Irrevocable Trust',     matches:true  },
+      ]},
+    spiderman:   { name:'Parker Family Irrevocable Trust', formed:'June 10, 2022', lastAmended:'January 4, 2025', certOnFile:true, attorney:'SoCal Coast Trust · Ari Gold, Esq.',
+      assets:[
+        { cat:'Real Estate',   desc:'Queens Residence — Queens, NY',      titleName:'Peter Parker',                   matches:false },
+        { cat:'Bank',          desc:'Chase — Personal Checking',          titleName:'Parker Family Irrevocable Trust',matches:true  },
+        { cat:'Investment',    desc:'Vanguard — Index Fund Account',      titleName:'Parker Family Irrevocable Trust',matches:true  },
+        { cat:'Business',      desc:'Parker Photography LLC',             titleName:'Peter Parker',                   matches:false },
+        { cat:'Life Insurance',desc:'MassMutual Term — POL004',           titleName:'Parker Family Irrevocable Trust',matches:true  },
+        { cat:'Life Insurance',desc:'Northwestern Whole Life — POL005',   titleName:'Parker Family Irrevocable Trust',matches:true  },
+      ]},
+    superman:    { name:'Kent Family Revocable Trust', formed:'March 3, 2021', lastAmended:'March 3, 2021', certOnFile:false, attorney:'SoCal Coast Trust · Ari Gold, Esq.',
+      assets:[
+        { cat:'Real Estate',   desc:'Metropolis Condo — Metropolis, IL',  titleName:'Clark Kent',                     matches:false },
+        { cat:'Real Estate',   desc:'Smallville Farm — Smallville, KS',   titleName:'Kent Family Revocable Trust',    matches:true  },
+        { cat:'Bank',          desc:'Wells Fargo — Personal Checking',    titleName:'Clark Kent',                     matches:false },
+        { cat:'Investment',    desc:'Daily Planet 401(k)',                 titleName:'Clark Kent',                     matches:false },
+        { cat:'Life Insurance',desc:'Lincoln Term — POL006',              titleName:'Kent Family Revocable Trust',    matches:true  },
+      ]},
+    wonderwoman: { name:'Prince Estate Irrevocable Trust', formed:'November 12, 2018', lastAmended:'September 1, 2023', certOnFile:true, attorney:'SoCal Coast Trust · Ari Gold, Esq.',
+      assets:[
+        { cat:'Real Estate',   desc:'Embassy Residence — Washington, DC', titleName:'Prince Estate Irrevocable Trust',matches:true  },
+        { cat:'Real Estate',   desc:'Themyscira Estate',                  titleName:'Diana Prince',                   matches:false },
+        { cat:'Bank',          desc:'Citibank — Private Banking',         titleName:'Prince Estate Irrevocable Trust',matches:true  },
+        { cat:'Investment',    desc:'Goldman Sachs — Managed Account',    titleName:'Prince Estate Irrevocable Trust',matches:true  },
+        { cat:'Business',      desc:'Prince Holdings LLC',                titleName:'Diana Prince',                   matches:false },
+        { cat:'Life Insurance',desc:'NY Life Whole Life — POL007',        titleName:'Prince Estate Irrevocable Trust',matches:true  },
+        { cat:'Life Insurance',desc:'Pacific Universal — POL008',         titleName:'Prince Estate Irrevocable Trust',matches:true  },
+      ]},
+    batman:      { name:'Wayne Family Irrevocable Trust', formed:'April 5, 2015', lastAmended:'December 10, 2024', certOnFile:true, attorney:'SoCal Coast Trust · Ari Gold, Esq.',
+      assets:[
+        { cat:'Real Estate',   desc:'Wayne Manor — Gotham City, NJ',      titleName:'Wayne Family Irrevocable Trust', matches:true  },
+        { cat:'Real Estate',   desc:'Penthouse — Gotham City, NJ',        titleName:'Bruce Wayne',                    matches:false },
+        { cat:'Bank',          desc:'Gotham City Bank — Private',         titleName:'Wayne Family Irrevocable Trust', matches:true  },
+        { cat:'Investment',    desc:'Wayne Enterprises Stock',            titleName:'Bruce Wayne',                    matches:false },
+        { cat:'Investment',    desc:'Merrill Lynch — Trust Account',      titleName:'Wayne Family Irrevocable Trust', matches:true  },
+        { cat:'Business',      desc:'Wayne Enterprises Inc.',             titleName:'Wayne Family Irrevocable Trust', matches:true  },
+        { cat:'Business',      desc:'Wayne Tech LP',                      titleName:'Bruce Wayne',                    matches:false },
+        { cat:'Life Insurance',desc:'Prudential Whole Life — POL009',     titleName:'Wayne Family Irrevocable Trust', matches:true  },
+        { cat:'Life Insurance',desc:'AIG Universal — POL010',             titleName:'Wayne Family Irrevocable Trust', matches:true  },
+      ]},
+    hulk:        { name:'Banner Irrevocable Trust', formed:'August 22, 2020', lastAmended:'October 15, 2024', certOnFile:true, attorney:'SoCal Coast Trust · Ari Gold, Esq.',
+      assets:[
+        { cat:'Real Estate',   desc:'Dayton Residence — Dayton, OH',      titleName:'Bruce Banner',                   matches:false },
+        { cat:'Bank',          desc:'Bank of America — Research Account', titleName:'Banner Irrevocable Trust',       matches:true  },
+        { cat:'Investment',    desc:'Schwab — Brokerage (PPLI Collateral)',titleName:'Banner Irrevocable Trust',      matches:true  },
+        { cat:'Business',      desc:'Banner Labs LLC',                    titleName:'Bruce Banner',                   matches:false },
+        { cat:'Life Insurance',desc:'PPLI — POL011',                      titleName:'Banner Irrevocable Trust',       matches:true  },
+      ]},
+    wolverine:   { name:'Logan Estate Irrevocable Trust', formed:'January 17, 2022', lastAmended:'January 17, 2022', certOnFile:true, attorney:'SoCal Coast Trust · Ari Gold, Esq.',
+      assets:[
+        { cat:'Real Estate',   desc:'Alberta Property — Alberta, Canada', titleName:'Logan Estate Irrevocable Trust', matches:true  },
+        { cat:'Bank',          desc:'TD Bank — Personal Checking',        titleName:'James Logan',                    matches:false },
+        { cat:'Investment',    desc:'Cash + Brokerage (ILIT Collateral)', titleName:'Logan Estate Irrevocable Trust', matches:true  },
+        { cat:'Business',      desc:'Weapon X Consulting LLC',            titleName:'James Logan',                    matches:false },
+        { cat:'Life Insurance',desc:'ILIT — POL012',                      titleName:'Logan Estate Irrevocable Trust', matches:true  },
+      ]},
+    thor:        { name:'Odinson Family Revocable Trust', formed:'September 9, 2023', lastAmended:'September 9, 2023', certOnFile:false, attorney:'SoCal Coast Trust · Ari Gold, Esq.',
+      assets:[
+        { cat:'Real Estate',   desc:'Asgard Ave Residence — New York, NY',titleName:'Thor Odinson',                   matches:false },
+        { cat:'Bank',          desc:'Chase — Personal Checking',          titleName:'Thor Odinson',                   matches:false },
+        { cat:'Investment',    desc:'Fidelity — IRA',                     titleName:'Thor Odinson',                   matches:false },
+        { cat:'Life Insurance',desc:'Pacific Life Term — POL001',         titleName:'Odinson Family Revocable Trust', matches:true  },
+      ]},
+    seinfeld:    { name:'Seinfeld Family Irrevocable Trust', formed:'May 14, 2018', lastAmended:'January 20, 2025', certOnFile:true, attorney:'SoCal Coast Trust · Ari Gold, Esq.',
+      assets:[
+        { cat:'Real Estate',   desc:'Upper West Side Apt — New York, NY', titleName:'Seinfeld Family Irrevocable Trust', matches:true  },
+        { cat:'Real Estate',   desc:'Hamptons Summer Home — NY',          titleName:'Jerry Seinfeld',                    matches:false },
+        { cat:'Bank',          desc:'JPMorgan Chase — Private Banking',   titleName:'Seinfeld Family Irrevocable Trust', matches:true  },
+        { cat:'Investment',    desc:'Fidelity — Brokerage Account',       titleName:'Jerry Seinfeld',                    matches:false },
+        { cat:'Business',      desc:'Castle Rock Entertainment LLC',      titleName:'Seinfeld Family Irrevocable Trust', matches:true  },
+        { cat:'Life Insurance',desc:'Guardian Whole Life — POL013',       titleName:'Seinfeld Family Irrevocable Trust', matches:true  },
+        { cat:'Life Insurance',desc:'MassMutual Term — POL014',           titleName:'Seinfeld Family Irrevocable Trust', matches:true  },
+      ]},
+    taylor:      { name:'Taylor Family Revocable Trust', formed:'August 1, 2019', lastAmended:'August 1, 2019', certOnFile:false, attorney:'SoCal Coast Trust · Ari Gold, Esq.',
+      assets:[
+        { cat:'Real Estate',   desc:'Dillon TX Residence',                titleName:'Eric Taylor',                     matches:false },
+        { cat:'Bank',          desc:'First National Bank — Checking',     titleName:'Taylor Family Revocable Trust',   matches:true  },
+        { cat:'Investment',    desc:'Vanguard — Retirement Account',      titleName:'Eric Taylor',                     matches:false },
+        { cat:'Life Insurance',desc:'NY Life Whole Life — POL015',        titleName:'Taylor Family Revocable Trust',   matches:true  },
+        { cat:'Life Insurance',desc:'Pacific Universal — POL016',         titleName:'Taylor Family Revocable Trust',   matches:true  },
+      ]},
+    rachel:      { name:'Green Family Irrevocable Trust', formed:'April 3, 2022', lastAmended:'November 12, 2024', certOnFile:true, attorney:'SoCal Coast Trust · Ari Gold, Esq.',
+      assets:[
+        { cat:'Real Estate',   desc:'Upper East Side Condo — New York',   titleName:'Green Family Irrevocable Trust',  matches:true  },
+        { cat:'Bank',          desc:'Bank of America — Personal',         titleName:'Rachel Green',                    matches:false },
+        { cat:'Investment',    desc:'Schwab — Investment Account',        titleName:'Green Family Irrevocable Trust',  matches:true  },
+        { cat:'Life Insurance',desc:'Guardian Term — POL017',             titleName:'Green Family Irrevocable Trust',  matches:true  },
+        { cat:'Life Insurance',desc:'Northwestern WL — POL018',           titleName:'Green Family Irrevocable Trust',  matches:true  },
+      ]},
+    sydney:      { name:'Bristow Irrevocable Trust', formed:'February 28, 2017', lastAmended:'March 5, 2023', certOnFile:true, attorney:'SoCal Coast Trust · Ari Gold, Esq.',
+      assets:[
+        { cat:'Real Estate',   desc:'Los Angeles Residence — LA, CA',     titleName:'Bristow Irrevocable Trust',       matches:true  },
+        { cat:'Bank',          desc:'Wells Fargo — Operative Account',    titleName:'Sydney Bristow',                  matches:false },
+        { cat:'Investment',    desc:'Goldman Sachs — Managed Portfolio',  titleName:'Bristow Irrevocable Trust',       matches:true  },
+        { cat:'Business',      desc:'APO Consulting LLC',                 titleName:'Sydney Bristow',                  matches:false },
+        { cat:'Life Insurance',desc:'MassMutual Universal — POL019',      titleName:'Bristow Irrevocable Trust',       matches:true  },
+      ]},
+  },
+  clients: {
+    thor:        { name:'Thor',         agent:'scott',   avatar:'TH', color:'#e8715a', policies:['P01'] },
+    ironman:     { name:'Iron Man',     agent:'scott',   avatar:'IM', color:'#c0392b', policies:['P02','P03'] },
+    spiderman:   { name:'SpiderMan',    agent:'scott',   avatar:'SP', color:'#e67e22', policies:['P04','P05'] },
+    superman:    { name:'SuperMan',     agent:'scott',   avatar:'SM', color:'#2980b9', policies:['P06'] },
+    wonderwoman: { name:'Wonder Woman', agent:'anthony', avatar:'WW', color:'#8e44ad', policies:['P07','P08'] },
+    batman:      { name:'Batman',       agent:'anthony', avatar:'BA', color:'#2c3e50', policies:['P09','P10'] },
+    hulk:        { name:'Hulk',         agent:'anthony', avatar:'HK', color:'#27ae60', policies:['P11'] },
+    wolverine:   { name:'Wolverine',    agent:'anthony', avatar:'WO', color:'#d4a017', policies:['P12'] },
+    seinfeld:    { name:'Jerry Seinfeld', agent:'rainmaker', avatar:'JS', color:'#0891b2', policies:['P13','P14'] },
+    taylor:      { name:'Coach Taylor',   agent:'rainmaker', avatar:'CT', color:'#059669', policies:['P15','P16'] },
+    rachel:      { name:'Rachel Green',   agent:'rainmaker', avatar:'RG', color:'#db2777', policies:['P17','P18'] },
+    sydney:      { name:'Sydney Bristow', agent:'rainmaker', avatar:'SB', color:'#7c3aed', policies:['P19'] }
+  },
+  policies: {
+    P01:{ carrier:'Pacific Life',         type:'Term 30',        tt:'term',  db:1000000,  pm:105,    freq:'Monthly', eff:'Jun 2024', end:'Jun 2054', conv:'Jun 2034', status:'Active', emoji:'🛡️', cashVal:0,      commRate:.05,  commYrs:1  },
+    P02:{ carrier:'Prudential',           type:'Term 30',        tt:'term',  db:2000000,  pm:190,    freq:'Monthly', eff:'Sep 2023', end:'Sep 2053', conv:'Sep 2033', status:'Active', emoji:'🛡️', cashVal:0,      commRate:.05,  commYrs:2  },
+    P03:{ carrier:'Guardian',             type:'Whole Life',     tt:'whole', db:750000,   pm:980,    freq:'Monthly', eff:'Sep 2023', end:'Mar 2099', conv:null,        status:'Active', emoji:'🏛️', cashVal:18600,  commRate:.55,  commYrs:2  },
+    P04:{ carrier:'MassMutual',           type:'Term 30',        tt:'term',  db:1500000,  pm:125,    freq:'Monthly', eff:'Jan 2025', end:'Jan 2055', conv:'Jan 2035', status:'Active', emoji:'🛡️', cashVal:0,      commRate:.05,  commYrs:1  },
+    P05:{ carrier:'Northwestern Mutual',  type:'Whole Life',     tt:'whole', db:500000,   pm:620,    freq:'Monthly', eff:'Jan 2025', end:'Aug 2116', conv:null,        status:'Active', emoji:'🏛️', cashVal:7440,   commRate:.55,  commYrs:1  },
+    P06:{ carrier:'Lincoln Financial',    type:'Term 30',        tt:'term',  db:10000000, pm:890,    freq:'Monthly', eff:'Apr 2022', end:'Apr 2052', conv:'Apr 2032', status:'Active', emoji:'🛡️', cashVal:0,      commRate:.05,  commYrs:3  },
+    P07:{ carrier:'New York Life',        type:'Whole Life',     tt:'whole', db:1000000,  pm:1450,   freq:'Monthly', eff:'Jul 2021', end:'Nov 2108', conv:null,        status:'Active', emoji:'🏛️', cashVal:58000,  commRate:.55,  commYrs:4  },
+    P08:{ carrier:'Pacific Life',         type:'Universal Life', tt:'univ',  db:1500000,  pm:980,    freq:'Monthly', eff:'Jul 2021', end:'Nov 2108', conv:null,        status:'Active', emoji:'⚡', cashVal:31200,  commRate:.45,  commYrs:4  },
+    P09:{ carrier:'Prudential',           type:'Whole Life',     tt:'whole', db:2800000,  pm:3200,   freq:'Monthly', eff:'May 2020', end:'Feb 2097', conv:null,        status:'Active', emoji:'🏛️', cashVal:60480,  commRate:.55,  commYrs:5  },
+    P10:{ carrier:'AIG',                  type:'Universal Life', tt:'univ',  db:2000000,  pm:1350,   freq:'Monthly', eff:'May 2020', end:'Feb 2097', conv:null,        status:'Active', emoji:'⚡', cashVal:48600,  commRate:.45,  commYrs:5  },
+    P11:{ carrier:'Private Placement',    type:'PPLI',           tt:'prem',  db:5000000,  pm:240000, freq:'Annual',  eff:'Oct 2024', end:null,       conv:null,        status:'Active', emoji:'💎', cashVal:null,   commRate:.02,  commYrs:1  },
+    P12:{ carrier:'Trust-Owned Carrier',  type:'ILIT',           tt:'prem',  db:8000000,  pm:310000, freq:'Annual',  eff:'Dec 2022', end:null,       conv:null,        status:'Active', emoji:'🏦', cashVal:null,   commRate:.02,  commYrs:3  },
+    P13:{ carrier:'Guardian',             type:'Whole Life',     tt:'whole', db:2000000,  pm:2200,   freq:'Monthly', eff:'Mar 2023', end:'Mar 2100', conv:null,        status:'Active', emoji:'🏛️', cashVal:42000,  commRate:.55,  commYrs:2  },
+    P14:{ carrier:'MassMutual',           type:'Term 20',        tt:'term',  db:3000000,  pm:210,    freq:'Monthly', eff:'Mar 2023', end:'Mar 2043', conv:'Mar 2033', status:'Active', emoji:'🛡️', cashVal:0,      commRate:.05,  commYrs:2  },
+    P15:{ carrier:'New York Life',        type:'Whole Life',     tt:'whole', db:1500000,  pm:1800,   freq:'Monthly', eff:'Aug 2022', end:'Aug 2099', conv:null,        status:'Active', emoji:'🏛️', cashVal:55000,  commRate:.55,  commYrs:3  },
+    P16:{ carrier:'Pacific Life',         type:'Universal Life', tt:'univ',  db:2500000,  pm:1450,   freq:'Monthly', eff:'Aug 2022', end:'Aug 2099', conv:null,        status:'Active', emoji:'⚡', cashVal:28000,  commRate:.45,  commYrs:3  },
+    P17:{ carrier:'Guardian',             type:'Term 30',        tt:'term',  db:1000000,  pm:95,     freq:'Monthly', eff:'Nov 2024', end:'Nov 2054', conv:'Nov 2034', status:'Active', emoji:'🛡️', cashVal:0,      commRate:.05,  commYrs:1  },
+    P18:{ carrier:'Northwestern Mutual',  type:'Whole Life',     tt:'whole', db:750000,   pm:880,    freq:'Monthly', eff:'Nov 2024', end:'Sep 2116', conv:null,        status:'Active', emoji:'🏛️', cashVal:8800,   commRate:.55,  commYrs:1  },
+    P19:{ carrier:'MassMutual',           type:'Universal Life', tt:'univ',  db:5000000,  pm:3800,   freq:'Monthly', eff:'Jan 2021', end:'Jan 2099', conv:null,        status:'Active', emoji:'⚡', cashVal:182000, commRate:.45,  commYrs:5  }
+  },
+  prospects: {
+    hansolo: {
+      name:'Han Solo', agent:'scott', initials:'HS', color:'#d97706',
+      stage:'Illustration Requested',
+      desiredCoverage: 1500000,
+      carriersConsidered: ['Protective','Pacific Life','Prudential'],
+      typesConsidered: ['Term 20','Term 30'],
+      primaryNeed: 'Income replacement — self-employed, family of 4',
+      estPremRange: '$85–$120/mo',
+      targetDate:'May 2026', notes:'Prefers low premium; not ready for WL yet. Good candidate for term-to-WL conversion story.'
+    },
+    r2d2: {
+      name:'R2-D2', agent:'scott', initials:'R2', color:'#2563eb',
+      stage:'Needs Analysis Complete',
+      desiredCoverage: 500000,
+      carriersConsidered: ['Guardian','MassMutual','Northwestern Mutual'],
+      typesConsidered: ['Whole Life','Guaranteed UL'],
+      primaryNeed: 'Estate planning + cash accumulation for business owner',
+      estPremRange: '$280–$350/mo',
+      targetDate:'Jun 2026', notes:'Has existing term expiring 2027. Want to replace with permanent. Decision pending spouse approval.'
+    },
+    c3po: {
+      name:'C-3PO', agent:'scott', initials:'C3', color:'#b45309',
+      stage:'Quote Delivered',
+      desiredCoverage: 1000000,
+      carriersConsidered: ['Pacific Life','Lincoln Financial','AIG'],
+      typesConsidered: ['Universal Life','Indexed UL'],
+      primaryNeed: 'Flexible premium with cash value growth — tech exec',
+      estPremRange:'$580–$680/mo',
+      targetDate:'Jun 2026', notes:'Interested in IUL for tax-advantaged growth. Has seen illustration. Follow-up scheduled.'
+    },
+    leia: {
+      name:'Princess Leia', agent:'scott', initials:'PL', color:'#7c3aed',
+      stage:'Application Pending',
+      desiredCoverage: 2000000,
+      carriersConsidered: ['Prudential','New York Life'],
+      typesConsidered: ['Term 30'],
+      primaryNeed: 'Mortgage protection + income replacement — dual income household',
+      estPremRange:'$160–$200/mo',
+      targetDate:'Jul 2026', notes:'Application drafted. Waiting on medical records from PCP. Strong candidate — healthy, non-smoker.'
+    },
+    luke: {
+      name:'Luke Skywalker', agent:'anthony', initials:'LS', color:'#059669',
+      stage:'Needs Analysis Complete',
+      desiredCoverage: 750000,
+      carriersConsidered: ['MassMutual','Guardian','Northwestern Mutual'],
+      typesConsidered: ['Whole Life','Term + WL Combo'],
+      primaryNeed: 'Long-term wealth building + family protection — early career professional',
+      estPremRange:'$480–$620/mo',
+      targetDate:'Jul 2026', notes:'Young, healthy. Great WL candidate. Considering blended policy to reduce premium while building cash value.'
+    },
+    chewie: {
+      name:'Chewbacca', agent:'anthony', initials:'CH', color:'#92400e',
+      stage:'Illustration Requested',
+      desiredCoverage: 2000000,
+      carriersConsidered: ['National Life Group','Pacific Life','Allianz'],
+      typesConsidered: ['Indexed UL','Variable UL'],
+      primaryNeed: 'High cash value accumulation — business buy-sell agreement',
+      estPremRange:'$800–$950/mo',
+      targetDate:'Aug 2026', notes:'Business partner also evaluating coverage. May be a multi-policy opportunity. Needs buy-sell illustration.'
+    },
+    yoda: {
+      name:'Yoda', agent:'anthony', initials:'YO', color:'#16a34a',
+      stage:'Quote Delivered',
+      desiredCoverage: 500000,
+      carriersConsidered: ['Lincoln Financial','Protective','Banner Life'],
+      typesConsidered: ['Term 10','Term 20'],
+      primaryNeed: 'Short-term coverage bridge — nearing retirement, final income protection years',
+      estPremRange:'$45–$65/mo',
+      targetDate:'May 2026', notes:'Conservative. Just wants simple, affordable coverage for 10 years until pension kicks in. Low friction close.'
+    },
+    obiwan: {
+      name:'Obi-Wan Kenobi', agent:'anthony', initials:'OW', color:'#1d4ed8',
+      stage:'Application Pending',
+      desiredCoverage: 1500000,
+      carriersConsidered: ['John Hancock','Prudential','Pacific Life'],
+      typesConsidered: ['Guaranteed UL','Whole Life'],
+      primaryNeed: 'Permanent coverage with guaranteed death benefit — legacy planning',
+      estPremRange:'$680–$780/mo',
+      targetDate:'Aug 2026', notes:'Prefers guaranteed product. Not interested in market-linked value. GUL to age 121 likely best fit. Strong close probability.'
+    },
+    kylo: {
+      name:'Kylo Ren', agent:'rainmaker', initials:'KR', color:'#1e293b',
+      stage:'Needs Analysis',
+      desiredCoverage: 3000000,
+      carriersConsidered: ['Guardian','Prudential','Pacific Life'],
+      typesConsidered: ['Term 20','Whole Life'],
+      primaryNeed: 'Income replacement — young family protection',
+      estPremRange:'$180–$320/mo',
+      targetDate:'May 2026', notes:'Complex family situation. Needs analysis in progress. Interested in term and whole life combo. Has questions about health rating.'
+    },
+    poe: {
+      name:'Poe Dameron', agent:'rainmaker', initials:'PD', color:'#b45309',
+      stage:'Illustration Requested',
+      desiredCoverage: 2000000,
+      carriersConsidered: ['MassMutual','Northwestern Mutual'],
+      typesConsidered: ['Whole Life','IUL'],
+      primaryNeed: 'Wealth building + death benefit — business owner',
+      estPremRange:'$1,200–$1,600/mo',
+      targetDate:'Apr 2026', notes:'Illustration requested for MassMutual WL and Northwestern IUL. Business owner seeking tax-advantaged growth. Decision expected within 30 days.'
+    },
+    anakin: {
+      name:'Anakin Skywalker', agent:'rainmaker', initials:'AS', color:'#dc2626',
+      stage:'Quote Delivered',
+      desiredCoverage: 5000000,
+      carriersConsidered: ['New York Life','Guardian','Lincoln Financial'],
+      typesConsidered: ['Term 30','Whole Life'],
+      primaryNeed: 'Large term for mortgage + whole life for estate — dual need',
+      estPremRange:'$380–$520/mo',
+      targetDate:'Mar 2026', notes:'Quote delivered for $3M term + $2M whole life split. Young children and large mortgage. Follow up scheduled next week.'
+    },
+    padme: {
+      name:'Padmé Amidala', agent:'rainmaker', initials:'PA', color:'#9d174d',
+      stage:'Application Pending',
+      desiredCoverage: 4500000,
+      carriersConsidered: ['Guardian','New York Life'],
+      typesConsidered: ['Whole Life','Guaranteed UL'],
+      primaryNeed: 'Estate planning and legacy transfer — high net worth',
+      estPremRange:'$2,800–$3,400/mo',
+      targetDate:'Mar 2026', notes:'Application in process. Trust coordination with Ari Gold underway. Premium finance discussion on table for next meeting.'
+    }
+  },
+  beneficiaries: {
+    thor:        [{ name:'Jane Thor',     rel:'Spouse', share:75 },{ name:'Kid Thor',     rel:'Child', share:25 }],
+    ironman:     [{ name:'Pepper Iron',   rel:'Spouse', share:75 },{ name:'Kid Iron',     rel:'Child', share:25 }],
+    spiderman:   [{ name:'MJ Spider',     rel:'Spouse', share:75 },{ name:'Kid Spider',   rel:'Child', share:25 }],
+    superman:    [{ name:'Lois Super',    rel:'Spouse', share:75 },{ name:'Kid Super',    rel:'Child', share:25 }],
+    wonderwoman: [{ name:'Steve Wonder',  rel:'Spouse', share:75 },{ name:'Kid Wonder',   rel:'Child', share:25 }],
+    batman:      [{ name:'Selina Batman', rel:'Spouse', share:75 },{ name:'Kid Batman',   rel:'Child', share:25 }],
+    hulk:        [{ name:'Betty Hulk',    rel:'Spouse', share:75 },{ name:'Kid Hulk',     rel:'Child', share:25 }],
+    wolverine:   [{ name:'Jean Wolverine',rel:'Spouse', share:75 },{ name:'Kid Wolverine',rel:'Child', share:25 }],
+    seinfeld:    [{ name:'Jessica Seinfeld', rel:'Spouse', share:70 },{ name:'Kid Seinfeld', rel:'Child', share:30 }],
+    taylor:      [{ name:'Tami Taylor',      rel:'Spouse', share:75 },{ name:'Kid Taylor',   rel:'Child', share:25 }],
+    rachel:      [{ name:'Monica Geller',    rel:'Sibling',share:50 },{ name:'Ross Geller',  rel:'Sibling',share:50 }],
+    sydney:      [{ name:'Jack Bristow',     rel:'Parent', share:60 },{ name:'Irina Derevko',rel:'Parent', share:40 }]
+  },
+  financeCase: [
+    { client:'Hulk',     subtype:'PPLI', lender:'Private Bank A',  rateType:'Variable', rate:'7.10%', spread:'SOFR + 2.25%', annPrem:240000, down:60000,  loan:180000, term:'10 yrs', payment:'Interest-only', col:'Brokerage Account',  colVal:2500000, ltv:'70%', repay:'Refinance or unwind year 7',         stress:'10.50%', stressNote:'Serviceable with current brokerage assets', pol:'P11', trust:null },
+    { client:'Wolverine', subtype:'ILIT', lender:'Private Bank B', rateType:'Fixed',    rate:'6.75%', spread:'—',            annPrem:310000, down:100000, loan:210000, term:'12 yrs', payment:'Interest-only', col:'Cash + Brokerage',    colVal:3200000, ltv:'65%', repay:'Hold through year 10 then exit',      stress:'9.50%',  stressNote:'Well-collateralized; trust structure intact', pol:'P12',
+      trust:{ name:'Logan Estate Trust', trustee:'Trustee Placeholder', attorney:'Attorney Placeholder', crummey:'Yes' } }
+  ]
+};
+
+// ═══════════ UTILS ═══════════
+const fmt = n => n>=1000000?'$'+(n/1000000).toFixed(1).replace(/\.0$/,'')+'M':n>=1000?'$'+(n/1000).toFixed(0)+'K':'$'+n.toLocaleString();
+const fmtFull = n => '$'+n.toLocaleString();
+const tagClass = t => ({term:'tag-term',whole:'tag-whole',univ:'tag-univ',prem:'tag-prem'})[t]||'tag-term';
+const typeColor = t => ({term:'#3b82f6',whole:'#22c55e',univ:'#8b5cf6',prem:'#f59e0b'})[t]||'#3b82f6';
+
+function calcComm(pid) {
+  const p = D.policies[pid];
+  const annual = p.freq==='Monthly' ? p.pm*12 : p.pm;
+  return Math.round(annual * p.commRate * p.commYrs);
+}
+function calcFutureComm(pid) {
+  const p = D.policies[pid];
+  const annual = p.freq==='Monthly' ? p.pm*12 : p.pm;
+  // renewal: ~5% of annual for subsequent years, projected 5 more years
+  const renewalRate = p.tt==='whole'||p.tt==='univ'||p.tt==='prem' ? 0.04 : 0.02;
+  return Math.round(annual * renewalRate * 5);
+}
+
+// ═══════════ STATE ═══════════
+let curView='agent', curAgent='scott', curClient='ironman', curClientTab='policies';
+
+// ═══════════ VIEW SWITCH ═══════════
+function switchView(v) {
+  curView = v;
+  // Update nav buttons
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  // Hide ALL screens first
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  // Show correct sidebar
+  document.getElementById('agent-sidebar').style.display = v === 'agent' ? 'flex' : 'none';
+  document.getElementById('client-sidebar').style.display = v === 'client' ? 'flex' : 'none';
+  document.getElementById('god-sidebar').style.display = v === 'god' ? 'flex' : 'none';
+  // Navigate to correct starting screen
+  if (v === 'agent') agentNav('overview');
+  else if (v === 'client') { renderClientView(curClient); clientNav('policies'); }
+  else if (v === 'god') godNav('dashboard');
+}
+
+// ═══════════ AGENT NAV ═══════════
+function agentNav(page) {
+  document.querySelectorAll('.sb-item').forEach(s=>s.classList.remove('active'));
+  const nav = document.getElementById('anav-'+page);
+  if(nav) nav.classList.add('active');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-agent-'+page).classList.add('active');
+  if(page==='overview') renderOverview();
+  else if(page==='clients') renderClientsList();
+  else if(page==='prospects') renderProspects();
+  else if(page==='lookup') { document.getElementById('lu-input').value=''; document.getElementById('lu-results').innerHTML=''; document.getElementById('lu-placeholder').style.display='block'; setTimeout(()=>document.getElementById('lu-input').focus(),100); }
+  else if(page==='finance') renderFinance();
+  else if(page==='equity') renderEquity();
+  else if(page==='licensing') renderLicensing();
+  updateSummaryBar(page);
+}
+
+// ═══════════ GOD VIEW NAV ═══════════
+function godNav(page) {
+  document.querySelectorAll('#god-sidebar .sb-item').forEach(s=>s.classList.remove('active'));
+  const nav = document.getElementById('gnav-'+page);
+  if(nav) nav.classList.add('active');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-god-'+page).classList.add('active');
+  if(page==='dashboard') renderGodDashboard();
+  else if(page==='sales') renderGodSales();
+  else if(page==='agentperf') renderGodAgents();
+  else if(page==='financial') renderGodFinancial();
+  updateSummaryBar(page);
+}
+
+function selectAgent(id) {
+  curAgent=id;
+  document.querySelectorAll('.agent-sel').forEach(a=>a.classList.remove('selected'));
+  document.getElementById('asel-'+id).classList.add('selected');
+  agentNav('overview');
+}
+
+// ═══════════ OVERVIEW ═══════════
+function renderOverview() {
+  const ag = D.agents[curAgent];
+  document.getElementById('ov-title').textContent='Good morning — '+ag.name;
+  const agentLocations = { scott:'Encinitas, CA', anthony:'Del Mar, CA', rainmaker:'La Jolla, CA' };
+  document.getElementById('ov-sub').textContent=ag.clients.length+' clients · '+ag.prospects.length+' prospects · '+(agentLocations[curAgent]||'California');
+
+  let totalDB=0,totalPm=0,polCount=0,commTotal=0,commFuture=0;
+  ag.clients.forEach(cid=>{
+    D.clients[cid].policies.forEach(pid=>{
+      const p=D.policies[pid];
+      totalDB+=p.db; polCount++;
+      if(p.freq==='Monthly') totalPm+=p.pm;
+      commTotal+=calcComm(pid);
+      commFuture+=calcFutureComm(pid);
+    });
+  });
+  const comm12 = Math.round(commTotal * 0.28); // approx last 12mo share
+
+  document.getElementById('ov-stats').innerHTML=`
+    <div class="stat"><div class="s-label">Clients</div><div class="s-val">${ag.clients.length}</div><div class="s-sub">In-force</div></div>
+    <div class="stat"><div class="s-label">Policies</div><div class="s-val">${polCount}</div><div class="s-sub">Active</div></div>
+    <div class="stat"><div class="s-label">Total Coverage</div><div class="s-val">${fmt(totalDB)}</div><div class="s-sub">Death benefit</div></div>
+    <div class="stat"><div class="s-label">Monthly Premium</div><div class="s-val">${fmt(totalPm)}</div><div class="s-sub">Recurring</div></div>`;
+
+  document.getElementById('ov-comm-wrap').innerHTML=`
+    <!-- TOTAL COMMISSION — half-height coral bar -->
+    <div style="background:linear-gradient(135deg,#f43f5e,#e8715a);border-radius:var(--r);padding:8px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;box-shadow:var(--sh-md)">
+      <div style="display:flex;align-items:center;gap:18px">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.65)">Total Commission to Date</div>
+        <div style="font-family:var(--font-d);font-size:22px;color:white">${fmtFull(commTotal)}</div>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,.6)">${polCount} policies · ${ag.clients.length} clients · ${ag.name}</div>
+    </div>
+    <!-- 6 BLUE SUB-BLOCKS — taller with larger labels -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px">
+      ${[
+        { label:'MTD',              val: Math.round(commTotal*0.04),  sub:'Feb 2026' },
+        { label:'QTD',              val: Math.round(commTotal*0.11),  sub:'Q1 2026' },
+        { label:'YTD',              val: Math.round(commTotal*0.11),  sub:'Jan–Feb 2026' },
+        { label:'Past 12 Months',   val: Math.round(commTotal*0.28),  sub:'Mar 2025–Feb 2026' },
+        { label:'Projected Next Q', val: Math.round(commTotal*0.13),  sub:'Q2 2026 est.' },
+        { label:'Projected Next Yr',val: Math.round(commTotal*0.32),  sub:'2026 full yr est.' },
+      ].map(b=>`
+        <div style="background:var(--navy);border-radius:var(--rs);padding:20px 16px 18px;border:1px solid rgba(255,255,255,.08)">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.55);margin-bottom:10px">${b.label}</div>
+          <div style="font-family:var(--font-d);font-size:22px;color:white;margin-bottom:6px">${fmtFull(b.val)}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.35)">${b.sub}</div>
+        </div>`).join('')}
+    </div>`;
+
+  // Client rows
+  document.getElementById('ov-client-count').textContent=ag.clients.length;
+  document.getElementById('ov-client-rows').innerHTML=ag.clients.map(cid=>{
+    const c=D.clients[cid];
+    const db=c.policies.reduce((s,pid)=>s+D.policies[pid].db,0);
+    return `<div class="cl-row" onclick="jumpToClient('${cid}')">
+      <div class="ca" style="background:${c.color}">${c.avatar}</div>
+      <div><div class="cl-name">${c.name}</div><div class="cl-meta">${c.policies.length} polic${c.policies.length>1?'ies':'y'}</div></div>
+      <div class="cl-amt">${fmt(db)}</div>
+    </div>`;
+  }).join('');
+
+  // Mix
+  const types={term:0,whole:0,univ:0,prem:0};
+  ag.clients.forEach(cid=>D.clients[cid].policies.forEach(pid=>{ const t=D.policies[pid].tt; types[t]=(types[t]||0)+1; }));
+  const tot=Object.values(types).reduce((a,b)=>a+b,0);
+  const labels={term:'Term Life',whole:'Whole Life',univ:'Universal Life',prem:'Premium Finance'};
+  document.getElementById('ov-mix').innerHTML=Object.entries(types).filter(([k,v])=>v>0).map(([k,v])=>`
+    <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px">${labels[k]}</span><span style="font-size:11px;color:var(--gray-600)">${v}</span></div>
+    <div class="share-bar"><div class="share-fill" style="width:${(v/tot)*100}%;background:${typeColor(k)}"></div></div></div>`).join('');
+
+  // Alerts
+  const alerts=[];
+  ag.clients.forEach(cid=>{
+    D.clients[cid].policies.forEach(pid=>{
+      const p=D.policies[pid];
+      if(p.tt==='term'&&p.conv) alerts.push(`<div style="padding:7px 0;border-bottom:1px solid var(--gray-100);font-size:12px"><span style="color:var(--coral);font-weight:600">⚠️ Conversion:</span> ${D.clients[cid].name} · ${p.carrier} → ${p.conv}</div>`);
+    });
+  });
+  document.getElementById('ov-alerts').innerHTML=alerts.length?alerts.join(''):'<div style="color:var(--gray-400);font-size:12px">No urgent alerts</div>';
+
+  // Activity Feed
+  const agFeed = FEED_EVENTS.filter(e=>e.agent===ag.name).concat(FEED_EVENTS.filter(e=>e.agent!==ag.name)).slice(0,8);
+  renderFeed('ov-feed', agFeed, false);
+
+  updateSummaryBar('overview');
+}
+
+// ═══════════ CLIENTS LIST ═══════════
+function renderClientsList() {
+  const ag=D.agents[curAgent];
+  document.getElementById('cl-title').textContent=ag.name+' — My Clients';
+  let totDB=0, totPm=0, totPol=0, totComm=0;
+  document.getElementById('cl-tbody').innerHTML=ag.clients.map(cid=>{
+    const c=D.clients[cid];
+    const db=c.policies.reduce((s,pid)=>s+D.policies[pid].db,0);
+    const pm=c.policies.reduce((s,pid)=>{ const p=D.policies[pid]; return s+(p.freq==='Monthly'?p.pm:0);},0);
+    const comm=c.policies.reduce((s,pid)=>s+calcComm(pid),0);
+    const termEnds=c.policies.map(pid=>D.policies[pid]).filter(p=>p.tt==='term'&&p.end).map(p=>p.end);
+    const nearestEnd=termEnds.length?termEnds[0]:'—';
+    // next payment: just use first policy's next due (simulated as Mar 1 2026 for monthly)
+    const nextPay=pm>0?'Mar 1, 2026':'Oct 1, 2026';
+    totDB+=db; totPm+=pm; totPol+=c.policies.length; totComm+=comm;
+    return `<tr onclick="jumpToClient('${cid}')">
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="ca" style="background:${c.color};width:30px;height:30px;font-size:10px">${c.avatar}</div><strong>${c.name}</strong></div></td>
+      <td>${c.policies.length}</td>
+      <td><strong>${fmtFull(db)}</strong></td>
+      <td>${pm>0?fmtFull(pm)+'/mo':'Annual billing'}</td>
+      <td>${nearestEnd!=='—'?`<span class="date-chip">${nearestEnd}</span>`:'—'}</td>
+      <td style="color:var(--gray-600)">${nextPay}</td>
+      <td><strong style="color:var(--green)">${fmtFull(comm)}</strong></td>
+      <td><span class="status-badge s-active">● Active</span></td>
+    </tr>`;
+  }).join('');
+  // Summary footer
+  document.getElementById('cl-tfoot').innerHTML=`<tr style="background:var(--navy);color:white">
+    <td style="padding:11px 14px;font-weight:700;font-size:12px;border-radius:0 0 0 var(--r)">TOTAL · ${ag.name}</td>
+    <td style="padding:11px 14px;font-weight:700;font-size:13px">${totPol} policies</td>
+    <td style="padding:11px 14px;font-family:var(--font-d);font-size:15px;color:var(--coral)">${fmtFull(totDB)}</td>
+    <td style="padding:11px 14px;font-weight:600;font-size:12px">$${totPm.toLocaleString()}/mo</td>
+    <td colspan="2" style="padding:11px 14px"></td>
+    <td style="padding:11px 14px;font-family:var(--font-d);font-size:15px;color:var(--green)">${fmtFull(totComm)}</td>
+    <td style="padding:11px 14px;border-radius:0 0 var(--r) 0"></td>
+  </tr>`;
+  updateSummaryBar('clients');
+}
+
+// ═══════════ PROSPECTS ═══════════
+function stageColor(s) {
+  if(s.includes('Application')) return {bg:'#dcfce7',col:'#166534'};
+  if(s.includes('Quote')) return {bg:'#dbeafe',col:'#1d4ed8'};
+  if(s.includes('Illustration')) return {bg:'#fef3c7',col:'#92400e'};
+  return {bg:'#f3e8ff',col:'#7c3aed'};
+}
+function renderProspects() {
+  const ag=D.agents[curAgent];
+  document.getElementById('pr-title').textContent=ag.name+' — My Prospects';
+
+  // Aggregator bar at top
+  let totCov=0, appPending=0, quoteDel=0, totEstComm=0;
+  ag.prospects.forEach(pid=>{
+    const p=D.prospects[pid];
+    totCov+=p.desiredCoverage;
+    if(p.stage.includes('Application')) appPending++;
+    if(p.stage.includes('Quote')) quoteDel++;
+    const tt=p.typesConsidered[0]?p.typesConsidered[0].toLowerCase().includes('term')?'term':'whole':'whole';
+    totEstComm+=Math.round(p.desiredCoverage*(tt==='whole'?.55:.05)*0.0015*12);
+  });
+  document.getElementById('pr-aggregator').innerHTML=`
+    <div style="background:var(--navy);border-radius:var(--r);padding:18px 24px;display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-bottom:20px;border:1px solid rgba(255,255,255,.08)">
+      <div style="padding:0 20px 0 0;border-right:1px solid rgba(255,255,255,.1)">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);margin-bottom:5px">Total Prospects</div>
+        <div style="font-family:var(--font-d);font-size:24px;color:white">${ag.prospects.length}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px">In pipeline</div>
+      </div>
+      <div style="padding:0 20px;border-right:1px solid rgba(255,255,255,.1)">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);margin-bottom:5px">Desired Coverage</div>
+        <div style="font-family:var(--font-d);font-size:24px;color:var(--coral)">${fmt(totCov)}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px">Preliminary total</div>
+      </div>
+      <div style="padding:0 20px;border-right:1px solid rgba(255,255,255,.1)">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);margin-bottom:5px">Application Pending</div>
+        <div style="font-family:var(--font-d);font-size:24px;color:white">${appPending}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px">Nearest to close</div>
+      </div>
+      <div style="padding:0 20px;border-right:1px solid rgba(255,255,255,.1)">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);margin-bottom:5px">Quote Delivered</div>
+        <div style="font-family:var(--font-d);font-size:24px;color:white">${quoteDel}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px">Awaiting decision</div>
+      </div>
+      <div style="padding:0 0 0 20px">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);margin-bottom:5px">Est. Commission if Placed</div>
+        <div style="font-family:var(--font-d);font-size:24px;color:var(--green)">${fmtFull(totEstComm)}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px">If all close</div>
+      </div>
+    </div>`;
+
+  document.getElementById('pr-cards').innerHTML=ag.prospects.map(pid=>{
+    const p=D.prospects[pid];
+    if(p._converted) return `
+      <div style="background:var(--green-light);border-radius:var(--r);border:1px solid #bbf7d0;padding:16px 20px;margin-bottom:12px;display:flex;align-items:center;gap:14px;opacity:.75">
+        <div class="ca" style="background:var(--green);width:42px;height:42px;font-size:13px;font-weight:700">${p.initials}</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:15px;color:#166534">${p.name}</div>
+          <div style="font-size:12px;color:#166534;margin-top:2px">✅ Converted to Client — Policy application in progress</div>
+        </div>
+        <span style="background:var(--green);color:white;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px">Now a Client</span>
+      </div>`;
+    const sc=stageColor(p.stage);
+    const types=p.typesConsidered.map(t=>{
+      const tt=t.toLowerCase().includes('term')?'term':t.toLowerCase().includes('whole')?'whole':t.toLowerCase().includes('ul')||t.toLowerCase().includes('universal')||t.toLowerCase().includes('indexed')||t.toLowerCase().includes('guaranteed')?'univ':'whole';
+      return `<span class="tag ${tagClass(tt)}">${t}</span>`;
+    }).join(' ');
+    return `<div style="background:white;border-radius:var(--r);box-shadow:var(--sh-sm);border:1px solid var(--gray-200);margin-bottom:12px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--gray-100)">
+        <div class="ca" style="background:${p.color};width:42px;height:42px;font-size:13px;font-weight:700;flex-shrink:0">${p.initials}</div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:15px">${p.name}</div>
+          <div style="font-size:12px;color:var(--gray-600);margin-top:2px">${p.primaryNeed}</div>
+        </div>
+        <div style="text-align:right">
+          <span style="display:inline-block;background:${sc.bg};color:${sc.col};font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:.4px">${p.stage}</span>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Target close: ${p.targetDate}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;border-bottom:1px solid var(--gray-100)">
+        <div style="padding:12px 18px;border-right:1px solid var(--gray-100)">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);margin-bottom:4px">Desired Coverage</div>
+          <div style="font-family:var(--font-d);font-size:20px;color:var(--navy)">${fmt(p.desiredCoverage)}</div>
+          <div style="font-size:10px;color:var(--gray-400)">Preliminary amount</div>
+        </div>
+        <div style="padding:12px 18px;border-right:1px solid var(--gray-100)">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);margin-bottom:4px">Est. Premium Range</div>
+          <div style="font-size:16px;font-weight:600;color:var(--navy)">${p.estPremRange}</div>
+          <div style="font-size:10px;color:var(--gray-400)">Subject to underwriting</div>
+        </div>
+        <div style="padding:12px 18px;border-right:1px solid var(--gray-100)">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);margin-bottom:6px">Types Considered</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">${types}</div>
+        </div>
+        <div style="padding:12px 18px">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);margin-bottom:6px">Carriers Considered</div>
+          <div style="display:flex;flex-direction:column;gap:2px">${p.carriersConsidered.map(c=>`<div style="font-size:11px;color:var(--navy)">· ${c}</div>`).join('')}</div>
+        </div>
+      </div>
+      <div style="padding:10px 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div style="display:flex;align-items:flex-start;gap:8px;flex:1">
+          <span style="font-size:11px;color:var(--gray-400);flex-shrink:0;margin-top:1px">📝</span>
+          <span style="font-size:12px;color:var(--gray-600);font-style:italic">${p.notes}</span>
+        </div>
+        <button onclick="openConvModal('${pid}')" style="background:var(--green);color:white;border:none;border-radius:var(--rs);padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+          🎉 Convert to Client
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+  updateSummaryBar('prospects');
+}
+
+// ═══════════ LOOKUP ═══════════
+function runLookup(q) {
+  const res=document.getElementById('lu-results');
+  const ph=document.getElementById('lu-placeholder');
+  q=q.trim().toLowerCase();
+  if(!q){ res.innerHTML=''; ph.style.display='block'; return; }
+  ph.style.display='none';
+  const results=[];
+  Object.entries(D.clients).forEach(([cid,c])=>{ if(c.name.toLowerCase().includes(q)) results.push({type:'client',id:cid,name:c.name,agent:D.agents[c.agent].name,pols:c.policies.map(pid=>D.policies[pid])}); });
+  Object.entries(D.prospects).forEach(([pid,p])=>{ if(p.name.toLowerCase().includes(q)){ const primaryType=p.typesConsidered[0]||'Term'; const tt=primaryType.toLowerCase().includes('term')?'term':primaryType.toLowerCase().includes('whole')?'whole':'univ'; const primaryCarrier=p.carriersConsidered[0]||'TBD'; results.push({type:'lead',name:p.name,agent:p.agent in D.agents?D.agents[p.agent].name:p.agent,pols:[{carrier:primaryCarrier+' (primary)',type:primaryType,tt,db:p.desiredCoverage,pm:null,freq:'Monthly',status:'Pipeline',end:null,conv:null,estPremRange:p.estPremRange}]}); }});
+  if(!results.length){ res.innerHTML='<div style="text-align:center;padding:40px;color:var(--gray-400)">No results found</div>'; return; }
+  res.innerHTML=results.map(r=>`
+    <div class="lu-result">
+      <div class="lu-hdr">
+        <strong class="lu-name">${r.name}</strong>
+        <span class="lc-badge ${r.type==='client'?'lc-client':'lc-lead'}">${r.type==='client'?'Client':'Prospect'}</span>
+        <span class="lu-agent">Agent: ${r.agent}</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:var(--offwhite)">
+          <th style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);padding:8px 14px;text-align:left;border-bottom:1px solid var(--gray-200)">Carrier</th>
+          <th style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);padding:8px 14px;text-align:left;border-bottom:1px solid var(--gray-200)">Type</th>
+          <th style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);padding:8px 14px;text-align:left;border-bottom:1px solid var(--gray-200)">Death Benefit</th>
+          <th style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);padding:8px 14px;text-align:left;border-bottom:1px solid var(--gray-200)">Premium</th>
+          <th style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);padding:8px 14px;text-align:left;border-bottom:1px solid var(--gray-200)">Status</th>
+          <th style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);padding:8px 14px;text-align:left;border-bottom:1px solid var(--gray-200)">Policy End Date</th>
+          <th style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);padding:8px 14px;text-align:left;border-bottom:1px solid var(--gray-200)">Conversion By</th>
+        </tr></thead>
+        <tbody>${r.pols.map(p=>`<tr>
+          <td style="padding:10px 14px;border-bottom:1px solid var(--gray-100);font-size:12px">${p.carrier}</td>
+          <td style="padding:10px 14px;border-bottom:1px solid var(--gray-100);font-size:12px"><span class="tag ${tagClass(p.tt)}">${p.type}</span></td>
+          <td style="padding:10px 14px;border-bottom:1px solid var(--gray-100);font-size:12px"><strong>${fmtFull(p.db)}</strong></td>
+          <td style="padding:10px 14px;border-bottom:1px solid var(--gray-100);font-size:12px">${p.estPremRange ? p.estPremRange : (p.freq==='Monthly'?'$'+p.pm+'/mo':'$'+(p.pm||0).toLocaleString()+'/yr')}</td>
+          <td style="padding:10px 14px;border-bottom:1px solid var(--gray-100);font-size:12px"><span class="status-badge ${p.status==='Active'?'s-active':'s-pipeline'}">● ${p.status}</span></td>
+          <td style="padding:10px 14px;border-bottom:1px solid var(--gray-100);font-size:12px">${p.end&&p.tt==='term'?`<span class="date-chip">${p.end}</span>`:'—'}</td>
+          <td style="padding:10px 14px;border-bottom:1px solid var(--gray-100);font-size:12px">${p.conv?`<span class="date-chip">${p.conv}</span>`:'—'}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`).join('');
+}
+
+// ═══════════ FINANCE ═══════════
+function renderFinance() {
+  document.getElementById('finance-content').innerHTML=D.financeCase.map(c=>{
+    const pol=D.policies[c.pol];
+    return `<div class="pf-hero">
+      <div style="flex:1"><div class="pf-type">${c.subtype} · Premium Finance</div><div class="pf-db">${fmt(pol.db)}</div><div class="pf-carrier">${pol.carrier} · ${c.client}</div></div>
+      <div class="pf-div"></div>
+      <div style="display:flex;gap:24px;flex:2">
+        <div class="pf-s"><div class="pf-sl">Annual Premium</div><div class="pf-sv">${fmtFull(c.annPrem)}</div></div>
+        <div class="pf-s"><div class="pf-sl">Loan Amount</div><div class="pf-sv">${fmtFull(c.loan)}</div></div>
+        <div class="pf-s"><div class="pf-sl">Down Payment</div><div class="pf-sv">${fmtFull(c.down)}</div></div>
+        <div class="pf-s"><div class="pf-sl">Initial Rate</div><div class="pf-sv">${c.rate}</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-hdr">${c.client} — ${c.subtype} Case Detail</div>
+      <div class="card-body">
+        <div class="case-grid">
+          <div class="cf"><div class="cf-l">Lender</div><div class="cf-v">${c.lender}</div></div>
+          <div class="cf"><div class="cf-l">Rate Type</div><div class="cf-v">${c.rateType}</div></div>
+          <div class="cf"><div class="cf-l">Index / Spread</div><div class="cf-v">${c.spread}</div></div>
+          <div class="cf"><div class="cf-l">Collateral</div><div class="cf-v">${c.col}</div></div>
+          <div class="cf"><div class="cf-l">Collateral Value</div><div class="cf-v">${fmtFull(c.colVal)}</div></div>
+          <div class="cf"><div class="cf-l">Max LTV</div><div class="cf-v">${c.ltv}</div></div>
+          <div class="cf"><div class="cf-l">Term</div><div class="cf-v">${c.term}</div></div>
+          <div class="cf"><div class="cf-l">Payment</div><div class="cf-v">${c.payment}</div></div>
+          <div class="cf"><div class="cf-l">Repayment Strategy</div><div class="cf-v">${c.repay}</div></div>
+          ${c.trust?`<div class="cf"><div class="cf-l">Trust Name</div><div class="cf-v">${c.trust.name}</div></div><div class="cf"><div class="cf-l">Trustee</div><div class="cf-v">${c.trust.trustee}</div></div><div class="cf"><div class="cf-l">Crummey Notices</div><div class="cf-v">${c.trust.crummey}</div></div>`:''}
+        </div>
+        <div style="height:1px;background:var(--gray-200);margin:16px 0"></div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="stress-badge">⚠️ Stress Test: ${c.stress}</span>
+          <span style="font-size:12px;color:var(--gray-600)">${c.stressNote}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════ EQUITY TRACKER ═══════════
+function renderEquity() {
+  const ag = D.agents[curAgent];
+  const eq = ag.equity;
+  document.getElementById('eq-title').textContent = ag.name + ' — Equity Tracker';
+  document.getElementById('eq-sub').textContent = 'Grant date: ' + eq.grantDate + '  ·  409A valuation: $' + eq.valuation409a.toFixed(2) + '/share';
+
+  const vestedPct = eq.vestedPct;
+  const unvestedPct = 100 - vestedPct;
+
+  document.getElementById('eq-content').innerHTML = `
+
+    <!-- TOP STATS -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
+      <div style="background:var(--navy);border-radius:var(--r);padding:18px 20px;border:1px solid rgba(255,255,255,.08)">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);margin-bottom:6px">Total Equity Granted</div>
+        <div style="font-family:var(--font-d);font-size:26px;color:white">${eq.totalPct}%</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:3px">${eq.totalShares.toLocaleString()} shares</div>
+      </div>
+      <div style="background:var(--green-light);border-radius:var(--r);padding:18px 20px;border:1px solid #bbf7d0">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#166534;margin-bottom:6px">✅ Vested to Date</div>
+        <div style="font-family:var(--font-d);font-size:26px;color:#166534">${vestedPct}%</div>
+        <div style="font-size:12px;color:#166534;margin-top:3px">${eq.vestedShares.toLocaleString()} shares · <strong>${fmtFull(eq.vestedValue)}</strong></div>
+      </div>
+      <div style="background:#fff7ed;border-radius:var(--r);padding:18px 20px;border:1px solid #fed7aa">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#9a3412;margin-bottom:6px">⏳ Unvested</div>
+        <div style="font-family:var(--font-d);font-size:26px;color:#9a3412">${unvestedPct}%</div>
+        <div style="font-size:12px;color:#9a3412;margin-top:3px">${eq.unvestedShares.toLocaleString()} shares remaining</div>
+      </div>
+      <div style="background:var(--blue-light);border-radius:var(--r);padding:18px 20px;border:1px solid #bfdbfe">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#1d4ed8;margin-bottom:6px">Total Value (Fully Vested)</div>
+        <div style="font-family:var(--font-d);font-size:26px;color:#1d4ed8">${fmtFull(eq.totalValue)}</div>
+        <div style="font-size:12px;color:#1d4ed8;margin-top:3px">At $${eq.valuation409a.toFixed(2)}/share 409A</div>
+      </div>
+    </div>
+
+    <!-- VESTING PROGRESS -->
+    <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:22px 24px;margin-bottom:20px">
+      <div style="font-weight:600;font-size:14px;color:var(--navy);margin-bottom:16px">Vesting Schedule</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <div style="flex:1;height:12px;background:var(--gray-100);border-radius:6px;overflow:hidden">
+          <div style="height:100%;width:${vestedPct}%;background:linear-gradient(90deg,var(--green),#16a34a);border-radius:6px;transition:width .6s ease"></div>
+        </div>
+        <span style="font-weight:700;font-size:13px;color:var(--navy);min-width:36px">${vestedPct}%</span>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        ${eq.schedule.map(s=>`
+          <div style="flex:1;border-radius:var(--rs);padding:12px 14px;background:${s.done?'var(--green-light)':'var(--offwhite)'};border:1px solid ${s.done?'#bbf7d0':'var(--gray-200)'}">
+            <div style="font-size:10px;font-weight:600;color:${s.done?'#166534':'var(--gray-400)'};margin-bottom:4px">${s.date}</div>
+            <div style="font-size:13px;font-weight:700;color:${s.done?'#166534':'var(--navy)'}">+${s.shares.toLocaleString()}</div>
+            <div style="font-size:10px;color:${s.done?'#166534':'var(--gray-400)'};margin-top:2px">${s.pct}% tranche · ${s.done?'✅ Vested':'⏳ Pending'}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- TWO COLUMN: PRODUCTIVITY + EXIT SCENARIOS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+
+      <!-- PRODUCTIVITY TO EQUITY -->
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:22px 24px">
+        <div style="font-weight:600;font-size:14px;color:var(--navy);margin-bottom:16px">Productivity → Equity</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+          <div style="flex:1;height:10px;background:var(--gray-100);border-radius:5px;overflow:hidden">
+            <div style="height:100%;width:${Math.min(100,(eq.policiesSold/eq.clubTarget)*100)}%;background:linear-gradient(90deg,var(--blue),#2563eb);border-radius:5px"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:var(--navy)">${eq.policiesSold}/${eq.clubTarget}</span>
+        </div>
+        <div style="font-size:11px;color:var(--gray-400);margin-bottom:16px">Policies sold toward President's Club</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--offwhite);border-radius:var(--rs)">
+            <div><div style="font-size:12px;font-weight:600">Performance Ranking</div><div style="font-size:11px;color:var(--gray-400)">Company-wide</div></div>
+            <div style="font-family:var(--font-d);font-size:22px;color:var(--coral)">#${eq.rank} <span style="font-size:12px;color:var(--gray-400)">of ${eq.totalAgents}</span></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--blue-light);border-radius:var(--rs);border:1px solid #bfdbfe">
+            <div><div style="font-size:12px;font-weight:600;color:#1d4ed8">Hit President's Club Target</div><div style="font-size:11px;color:#3b82f6">${eq.clubTarget - eq.policiesSold} more policies needed</div></div>
+            <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:#1d4ed8">+${eq.bonusGrant}% equity</div><div style="font-size:11px;color:#3b82f6">${fmtFull(eq.bonusValue)} value</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXIT SCENARIOS -->
+      <div style="background:var(--navy);border-radius:var(--r);padding:22px 24px">
+        <div style="font-weight:600;font-size:14px;color:white;margin-bottom:4px">Exit Scenarios</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:18px">Your equity value at different outcomes</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          ${eq.exitScenarios.map((s,i)=>`
+            <div style="background:rgba(255,255,255,.07);border-radius:var(--rs);padding:14px 18px;border:1px solid rgba(255,255,255,.1)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:white">${s.label}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px">${s.multiple} return on 409A value</div>
+                </div>
+                <div style="font-family:var(--font-d);font-size:22px;color:${['var(--coral)','#22c55e','var(--amber)'][i]}">${fmtFull(s.value)}</div>
+              </div>
+              <div style="margin-top:10px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden">
+                <div style="height:100%;width:${[60,100,35][i]}%;background:${['var(--coral)','#22c55e','var(--amber)'][i]};border-radius:2px"></div>
+              </div>
+            </div>`).join('')}
+        </div>
+        <div style="margin-top:16px;padding:12px 14px;background:rgba(255,255,255,.05);border-radius:var(--rs);border:1px solid rgba(255,255,255,.08)">
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:rgba(255,255,255,.35);margin-bottom:4px">Tax Note</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.5)">Vested shares taxed as ordinary income at exercise. Long-term capital gains apply after 12-month hold post-exercise. Consult your tax advisor for net proceeds planning.</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ═══════════ CLIENT VIEW ═══════════
+function jumpToClient(cid) {
+  curClient=cid;
+  switchView('client');
+  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.view-btn')[1].classList.add('active');
+}
+
+function selectClient(cid) {
+  curClient=cid;
+  document.querySelectorAll('.client-pill').forEach(p=>p.classList.remove('selected'));
+  document.getElementById('cpill-'+cid).classList.add('selected');
+  renderClientView(cid);
+  clientNav(curClientTab);
+}
+
+function clientNav(tab) {
+  curClientTab=tab;
+  document.querySelectorAll('#client-sidebar .sb-item').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  if(tab==='policies') {
+    document.getElementById('cnav-policies').classList.add('active');
+    document.getElementById('screen-client-policies').classList.add('active');
+  } else if(tab==='trust') {
+    document.getElementById('cnav-trust').classList.add('active');
+    document.getElementById('screen-client-trust').classList.add('active');
+    renderTrust(curClient);
+  } else {
+    document.getElementById('cnav-beneficiaries').classList.add('active');
+    document.getElementById('screen-client-beneficiaries').classList.add('active');
+    renderAgg(curClient);
+  }
+  updateSummaryBar('client-'+tab);
+}
+
+// ═══════════ TRUST ═══════════
+function renderTrust(cid) {
+  const c=D.clients[cid];
+  const t=D.trusts[cid];
+  const agentObj=D.agents[c.agent];
+  document.getElementById('tr-title').textContent=c.name+' — Trust Integration';
+  document.getElementById('tr-sub').textContent='Estate plan overview · Attorney: '+t.attorney;
+
+  // Agent card
+  document.getElementById('tr-agent-card').innerHTML=`
+    <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--r);padding:10px 14px;display:inline-flex;align-items:center;gap:10px;box-shadow:var(--sh-sm)">
+      <div class="ca" style="background:var(--navy);width:32px;height:32px;font-size:10px">${agentObj.name.split(' ').map(w=>w[0]).join('')}</div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--navy)">${agentObj.name}</div><div style="font-size:10px;color:var(--gray-400)">Assigned agent</div></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--green);margin-left:4px"></div>
+    </div>`;
+
+  // Count matches
+  const matched=t.assets.filter(a=>a.matches).length;
+  const unmatched=t.assets.filter(a=>!a.matches).length;
+
+  // Group assets by category
+  const cats={};
+  t.assets.forEach(a=>{ if(!cats[a.cat]) cats[a.cat]=[]; cats[a.cat].push(a); });
+  const catIcons={'Real Estate':'🏠','Bank':'🏦','Investment':'📈','Business':'🏢','Life Insurance':'🛡️','Retirement':'💰','Vehicle':'🚗','Other':'📦'};
+
+  document.getElementById('tr-content').innerHTML=`
+    <!-- TRUST HERO -->
+    <div style="background:var(--navy);border-radius:var(--r);padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-30px;right:-30px;width:160px;height:160px;background:radial-gradient(circle,rgba(232,113,90,.18) 0%,transparent 70%);border-radius:50%"></div>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start">
+        <div>
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.4);margin-bottom:8px">Trust Name</div>
+          <div style="font-family:var(--font-d);font-size:28px;color:white;margin-bottom:16px">${t.name}</div>
+          <div style="display:flex;gap:28px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.35);margin-bottom:4px">Date Formed</div>
+              <div style="font-size:15px;font-weight:600;color:white">${t.formed}</div>
+            </div>
+            <div>
+              <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.35);margin-bottom:4px">Last Amended</div>
+              <div style="font-size:15px;font-weight:600;color:${t.formed===t.lastAmended?'#f59e0b':'white'}">${t.lastAmended}${t.formed===t.lastAmended?' ⚠️ Never updated':''}</div>
+            </div>
+            <div>
+              <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.35);margin-bottom:4px">Trust Attorney</div>
+              <div style="font-size:15px;font-weight:600;color:white">${t.attorney}</div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;background:rgba(255,255,255,.07);border-radius:var(--r);padding:16px 20px;min-width:140px">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);margin-bottom:6px">Cert of Trust</div>
+          ${t.certOnFile
+            ? `<div style="font-size:28px;margin-bottom:4px">📄</div><div style="color:var(--green);font-weight:600;font-size:12px">On File</div><div style="color:rgba(255,255,255,.4);font-size:10px;margin-top:3px;cursor:pointer;text-decoration:underline">View document</div>`
+            : `<div style="font-size:28px;margin-bottom:4px">⚠️</div><div style="color:var(--coral);font-weight:600;font-size:12px">Not Uploaded</div><div style="color:rgba(255,255,255,.4);font-size:10px;margin-top:3px;cursor:pointer;text-decoration:underline">Upload now</div>`
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- ASSET MATCH SUMMARY -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px">
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:16px 20px">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);margin-bottom:8px">Total Assets Listed</div>
+        <div style="font-family:var(--font-d);font-size:28px;color:var(--navy)">${t.assets.length}</div>
+        <div style="font-size:11px;color:var(--gray-600);margin-top:3px">Across all categories</div>
+      </div>
+      <div style="background:var(--green-light);border-radius:var(--r);border:1px solid #bbf7d0;box-shadow:var(--sh-sm);padding:16px 20px">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:#166534;margin-bottom:8px">✅ In Trust Name</div>
+        <div style="font-family:var(--font-d);font-size:28px;color:#166534">${matched}</div>
+        <div style="font-size:11px;color:#166534;margin-top:3px">Assets titled correctly</div>
+      </div>
+      <div style="background:#fff7ed;border-radius:var(--r);border:1px solid #fed7aa;box-shadow:var(--sh-sm);padding:16px 20px">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:#9a3412;margin-bottom:8px">⬜ Not in Trust Name</div>
+        <div style="font-family:var(--font-d);font-size:28px;color:#9a3412">${unmatched}</div>
+        <div style="font-size:11px;color:#9a3412;margin-top:3px">May need retitling</div>
+      </div>
+    </div>
+
+    <!-- SCHEDULE OF ASSETS -->
+    <div class="sec-hdr"><span class="sec-title">Schedule of Assets</span><span style="font-size:11px;color:var(--gray-400)">✅ = titled in trust name · ⬜ = needs attention</span></div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      ${Object.entries(cats).map(([cat,assets])=>`
+        <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);overflow:hidden">
+          <div style="background:var(--offwhite);padding:10px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;gap:8px">
+            <span style="font-size:16px">${catIcons[cat]||'📦'}</span>
+            <span style="font-weight:600;font-size:13px;color:var(--navy)">${cat}</span>
+            <span style="margin-left:auto;font-size:11px;color:var(--gray-400)">${assets.filter(a=>a.matches).length}/${assets.length} in trust</span>
+          </div>
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr style="background:var(--offwhite)">
+              <th style="padding:8px 18px;text-align:left;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);border-bottom:1px solid var(--gray-200)">Asset Description</th>
+              <th style="padding:8px 18px;text-align:left;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);border-bottom:1px solid var(--gray-200)">Current Title Name</th>
+              <th style="padding:8px 18px;text-align:center;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);border-bottom:1px solid var(--gray-200);width:120px">Matches Trust?</th>
+            </tr></thead>
+            <tbody>
+              ${assets.map(a=>`<tr style="border-bottom:1px solid var(--gray-100)">
+                <td style="padding:11px 18px;font-size:12px;color:var(--gray-800)">${a.desc}</td>
+                <td style="padding:11px 18px;font-size:12px;color:${a.matches?'var(--gray-800)':'#9a3412'};font-weight:${a.matches?'400':'500'}">${a.titleName}</td>
+                <td style="padding:11px 18px;text-align:center;font-size:18px">${a.matches?'✅':'⬜'}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`).join('')}
+    </div>
+
+    <!-- ATTORNEY NOTE -->
+    <div style="margin-top:20px;background:var(--amber-light);border:1px solid #fcd34d;border-radius:var(--r);padding:16px 20px;display:flex;gap:12px;align-items:flex-start">
+      <span style="font-size:20px;flex-shrink:0">💡</span>
+      <div>
+        <div style="font-weight:600;font-size:13px;color:#92400e;margin-bottom:4px">Attorney Recommendation</div>
+        <div style="font-size:12px;color:#92400e">Assets marked ⬜ may not pass to your trust upon death — they could go through probate instead. Contact <strong>${t.attorney}</strong> to retitle these assets into your trust name. This is a quick process and ensures your estate plan works as intended.</div>
+      </div>
+    </div>`;
+
+  updateSummaryBar('client-trust');
+}
+
+function renderClientView(cid) {
+  const c=D.clients[cid];
+  const pols=c.policies.map(pid=>({id:pid,...D.policies[pid]}));
+  const totalDB=pols.reduce((s,p)=>s+p.db,0);
+  const totalPm=pols.reduce((s,p)=>s+(p.freq==='Monthly'?p.pm:0),0);
+  const benes=D.beneficiaries[cid];
+  const agentObj=D.agents[c.agent];
+
+  document.getElementById('cp-title').textContent=c.name+' — My Policies';
+  document.getElementById('cp-sub').textContent=pols.length+' polic'+(pols.length>1?'ies':'y')+' across '+[...new Set(pols.map(p=>p.carrier))].length+' carrier'+([...new Set(pols.map(p=>p.carrier))].length>1?'s':'');
+
+  // Agent card
+  document.getElementById('cp-agent-card').innerHTML=`
+    <div style="background:white;border:1px solid var(--gray-200);border-radius:var(--r);padding:10px 14px;display:inline-flex;align-items:center;gap:10px;box-shadow:var(--sh-sm)">
+      <div class="ca" style="background:var(--navy);width:32px;height:32px;font-size:10px">${agentObj.name.split(' ').map(w=>w[0]).join('')}</div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--navy)">${agentObj.name}</div><div style="font-size:10px;color:var(--gray-400)">Your assigned agent</div></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--green);margin-left:4px"></div>
+    </div>`;
+
+  document.getElementById('cp-stats').innerHTML=`
+    <div class="stat"><div class="s-label">Policies</div><div class="s-val">${pols.length}</div><div class="s-sub">Active</div></div>
+    <div class="stat"><div class="s-label">Total Coverage</div><div class="s-val">${fmt(totalDB)}</div><div class="s-sub">Death benefit</div></div>
+    <div class="stat"><div class="s-label">Monthly Premium</div><div class="s-val">${totalPm>0?'$'+totalPm.toLocaleString():'Annual'}</div><div class="s-sub">${totalPm>0?'Auto-pay':'See annual'}</div></div>
+    <div class="stat"><div class="s-label">Beneficiaries</div><div class="s-val">${benes.length}</div><div class="s-sub">Named</div></div>`;
+
+  document.getElementById('cp-cards').innerHTML=pols.map((p,idx)=>`
+    <div class="pol-card">
+      <div class="pol-icon" style="background:${typeColor(p.tt)}18">${p.emoji}</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="pol-carrier">${p.carrier}</div>
+          ${idx===0?'<span style="background:#e0f2fe;color:#0369a1;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.4px">ModernLife ↗</span>':''}
+        </div>
+        <div class="pol-type"><span class="tag ${tagClass(p.tt)}">${p.type}</span></div>
+        <div class="pol-meta">
+          <div class="pmi"><div class="pmi-l">Premium</div><div class="pmi-v">${p.freq==='Monthly'?'$'+p.pm+'/mo':'$'+p.pm.toLocaleString()+'/yr'}</div></div>
+          <div class="pmi"><div class="pmi-l">Effective</div><div class="pmi-v">${p.eff}</div></div>
+          <div class="pmi"><div class="pmi-l">Next Payment</div><div class="pmi-v">${p.freq==='Monthly'?'Mar 1, 2026':'Oct 1, 2026'}</div></div>
+          ${p.tt==='term'&&p.end?`<div class="pmi"><div class="pmi-l">Policy Ends</div><div class="pmi-v alert">${p.end}</div></div>`:''}
+          ${p.conv?`<div class="pmi"><div class="pmi-l">Convert By</div><div class="pmi-v alert">${p.conv}</div></div>`:''}
+          ${p.cashVal?`<div class="pmi"><div class="pmi-l">Cash Value</div><div class="pmi-v">$${p.cashVal.toLocaleString()}</div></div>`:''}
+        </div>
+      </div>
+      <div class="pol-right">
+        <div class="db">${fmt(p.db)}</div>
+        <div class="db-l">Death Benefit</div>
+        <div><span class="status-badge s-active">● Active</span></div>
+      </div>
+    </div>
+    <div style="background:var(--offwhite);border:1px solid var(--gray-200);border-top:none;border-radius:0 0 var(--r) var(--r);padding:8px 16px 10px;margin-top:-4px;display:flex;gap:8px;flex-wrap:wrap">
+      ${benes.map(b=>`<div class="bene-chip"><span>${b.name}</span><span style="color:var(--gray-400);font-size:10px">${b.rel}</span><span class="bene-chip-pct">${b.share}%</span></div>`).join('')}
+    </div>`).join('');
+
+  // Summary table with footer
+  let tDB=0,tPm=0,tCV=0;
+  document.getElementById('cp-tbody').innerHTML=pols.map(p=>{
+    tDB+=p.db; if(p.freq==='Monthly') tPm+=p.pm; if(p.cashVal) tCV+=p.cashVal;
+    return `<tr>
+      <td><strong>${p.carrier}</strong></td>
+      <td><span class="tag ${tagClass(p.tt)}">${p.type}</span></td>
+      <td><strong>${fmtFull(p.db)}</strong></td>
+      <td>${p.freq==='Monthly'?'$'+p.pm+'/mo':'$'+p.pm.toLocaleString()+'/yr'}</td>
+      <td style="color:var(--gray-600)">${p.freq==='Monthly'?'Mar 1, 2026':'Oct 1, 2026'}</td>
+      <td>${p.end?`<span style="color:${p.tt==='term'?'var(--coral)':'var(--gray-800)'};font-weight:${p.tt==='term'?'600':'400'}">${p.end}</span>`:'<span style="color:var(--gray-400)">Permanent</span>'}</td>
+      <td>${p.conv?`<span class="date-chip">${p.conv}</span>`:'<span style="color:var(--gray-400)">—</span>'}</td>
+      <td>${p.cashVal!=null?'$'+p.cashVal.toLocaleString():'<span style="color:var(--gray-400)">N/A</span>'}</td>
+      <td><span class="status-badge s-active">● Active</span></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('cp-tfoot').innerHTML=`<tr style="background:var(--navy)">
+    <td colspan="2" style="padding:10px 14px;color:white;font-weight:700;font-size:12px">TOTAL</td>
+    <td style="padding:10px 14px;font-family:var(--font-d);font-size:15px;color:var(--coral)">${fmtFull(tDB)}</td>
+    <td style="padding:10px 14px;color:white;font-weight:600">${tPm>0?'$'+tPm.toLocaleString()+'/mo':'Annual'}</td>
+    <td colspan="3" style="padding:10px 14px"></td>
+    <td style="padding:10px 14px;color:var(--green);font-weight:600">${tCV>0?'$'+tCV.toLocaleString():''}</td>
+    <td style="padding:10px 14px"></td>
+  </tr>`;
+
+  // Bene summary footer
+  const aggB={};
+  benes.forEach(b=>{ aggB[b.name]={name:b.name,rel:b.rel,share:b.share,total:0}; });
+  pols.forEach(p=>{ benes.forEach(b=>{ aggB[b.name].total+=Math.round(p.db*(b.share/100)); }); });
+  const bList=Object.values(aggB).sort((a,b2)=>b2.total-a.total);
+  document.getElementById('cp-bene-summary').innerHTML=`
+    <div class="sec-hdr"><span class="sec-title">Beneficiary Summary</span><span style="font-size:11px;color:var(--gray-400)">If ${c.name} passes away today</span></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      ${bList.map((b,i)=>`
+        <div style="flex:1;min-width:180px;background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:16px 20px;display:flex;align-items:center;gap:14px">
+          <div class="ca" style="background:${['#e8715a','#3b82f6'][i%2]};width:38px;height:38px">${b.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
+          <div>
+            <div style="font-weight:600;font-size:13px">${b.name}</div>
+            <div style="font-size:10px;color:var(--gray-400);margin-top:1px">${b.rel} · ${b.share}% per policy</div>
+            <div style="font-family:var(--font-d);font-size:20px;color:var(--coral);margin-top:4px">${fmtFull(b.total)}</div>
+          </div>
+        </div>`).join('')}
+      <div style="flex:1;min-width:180px;background:var(--navy);border-radius:var(--r);padding:16px 20px;display:flex;flex-direction:column;justify-content:center">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);margin-bottom:6px">Total Estate</div>
+        <div style="font-family:var(--font-d);font-size:22px;color:white">${fmtFull(totalDB)}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:3px">Combined death benefit</div>
+        <a onclick="clientNav('beneficiaries')" style="color:var(--coral);font-size:11px;font-weight:600;margin-top:8px;cursor:pointer">Full breakdown →</a>
+      </div>
+    </div>`;
+
+  updateSummaryBar('client-policies');
+}
+
+// ═══════════ AGGREGATED BENE ═══════════
+function renderAgg(cid) {
+  const c=D.clients[cid];
+  const pols=c.policies.map(pid=>({id:pid,...D.policies[pid]})).filter(p=>p.status==='Active');
+  const benes=D.beneficiaries[cid];
+  const totalDB=pols.reduce((s,p)=>s+p.db,0);
+
+  document.getElementById('bene-sub').textContent=c.name+' · '+pols.length+' active polic'+(pols.length>1?'ies':'y');
+  document.getElementById('agg-sub').textContent='Across '+pols.length+' active polic'+(pols.length>1?'ies':'y')+' · '+benes.length+' beneficiaries';
+  document.getElementById('agg-total').textContent=fmtFull(totalDB);
+
+  const aggMap={};
+  benes.forEach(b=>{ aggMap[b.name]={name:b.name,rel:b.rel,share:b.share,total:0,breakdown:[]}; });
+  pols.forEach(p=>{ benes.forEach(b=>{ const pay=Math.round(p.db*(b.share/100)); aggMap[b.name].total+=pay; aggMap[b.name].breakdown.push({pol:p.type,carrier:p.carrier,db:p.db,pay}); }); });
+
+  const colors=['#e8715a','#3b82f6','#22c55e','#8b5cf6'];
+  document.getElementById('agg-cards').innerHTML=Object.values(aggMap).sort((a,b)=>b.total-a.total).map((b,i)=>`
+    <div class="agg-bene-card">
+      <div class="agg-bene-hdr" onclick="toggleBD(this)">
+        <div style="display:flex;align-items:center;gap:12px;flex:1">
+          <div class="ca" style="background:${colors[i%4]};width:38px;height:38px">${b.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
+          <div><div class="agg-bene-name">${b.name}</div><div class="agg-bene-rel">${b.rel} · ${b.share}% per policy</div></div>
+        </div>
+        <div style="text-align:right"><div class="agg-bene-amt">${fmtFull(b.total)}</div><div class="agg-bene-pct">${((b.total/totalDB)*100).toFixed(0)}% of total estate</div></div>
+        <div class="exp-ico">▾</div>
+      </div>
+      <div class="agg-breakdown">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);padding:10px 0 4px">Per Policy Breakdown</div>
+        ${b.breakdown.map(br=>`<div class="bd-row"><div><div class="bd-policy">${br.pol}</div><div class="bd-carrier">${br.carrier} · ${fmtFull(br.db)} total benefit</div></div><div class="bd-amt">${fmtFull(br.pay)}</div></div>`).join('')}
+        <div class="bd-row" style="background:var(--offwhite);margin:6px -18px 0;padding:8px 18px;font-weight:600"><div>Total to ${b.name}</div><div style="color:var(--coral)">${fmtFull(b.total)}</div></div>
+      </div>
+    </div>`).join('');
+  updateSummaryBar('client-beneficiaries');
+}
+
+function toggleBD(hdr) {
+  hdr.classList.toggle('open');
+  hdr.nextElementSibling.classList.toggle('open');
+}
+
+// ═══════════ SUMMARY BAR ═══════════
+function updateSummaryBar(context) {
+  const bar=document.getElementById('summary-bar');
+  let html='';
+
+  if(curView==='god') {
+    const godPages = { dashboard:'Company Dashboard', sales:'Sales Analytics', agentperf:'Agent Performance', financial:'Financial Dashboard' };
+    const pageName = godPages[context] || 'Executive View';
+    html=`<span class="sb-label-tag" style="color:var(--purple)">👁 GOD VIEW · ${pageName}</span>
+      <div class="sb-stat"><div class="sbs-l">Locations</div><div class="sbs-v">27</div></div>
+      <div class="sb-stat"><div class="sbs-l">Agents</div><div class="sbs-v">54</div></div>
+      <div class="sb-stat"><div class="sbs-l">Policies</div><div class="sbs-v">20,000+</div></div>
+      <div class="sb-stat"><div class="sbs-l">YTD Revenue</div><div class="sbs-v coral">$54M</div></div>
+      <div class="sb-stat"><div class="sbs-l">Retention</div><div class="sbs-v" style="color:var(--green)">94.2%</div></div>
+      <div class="sb-spacer"></div>
+      <div class="sb-stat"><div class="sbs-l">Projected 2026</div><div class="sbs-v" style="color:var(--amber)">$130M</div></div>`;
+  } else if(curView==='agent') {
+    const ag=D.agents[curAgent];
+    let totDB=0,totPm=0,polCnt=0,totComm=0,prospDB=0;
+    ag.clients.forEach(cid=>{ D.clients[cid].policies.forEach(pid=>{ const p=D.policies[pid]; totDB+=p.db; polCnt++; if(p.freq==='Monthly') totPm+=p.pm; totComm+=calcComm(pid); }); });
+    ag.prospects.forEach(pid=>{ prospDB+=D.prospects[pid].desiredCoverage||0; });
+
+    if(context==='prospects') {
+      let pCnt=ag.prospects.length, pDB=0, pComm=0;
+      ag.prospects.forEach(pid=>{ const p=D.prospects[pid]; pDB+=p.desiredCoverage; const tt=p.typesConsidered[0]?p.typesConsidered[0].toLowerCase().includes('term')?'term':'whole':'whole'; pComm+=Math.round((p.desiredCoverage*0.0015)*(tt==='whole'?.55:.05)*12); });
+      html=`<span class="sb-label-tag">${ag.name} · Prospects</span>
+        <div class="sb-stat"><div class="sbs-l">Prospects</div><div class="sbs-v">${pCnt}</div></div>
+        <div class="sb-stat"><div class="sbs-l">Desired Coverage (total)</div><div class="sbs-v">${fmt(pDB)}</div></div>
+        <div class="sb-stat"><div class="sbs-l">Application Pending</div><div class="sbs-v">${ag.prospects.filter(pid=>D.prospects[pid].stage.includes('Application')).length}</div></div>
+        <div class="sb-stat"><div class="sbs-l">Est. Commission if Placed</div><div class="sbs-v coral">${fmtFull(pComm)}</div></div>
+        <div class="sb-spacer"></div>
+        <div class="sb-stat"><div class="sbs-l">Status</div><div class="sbs-v" style="color:var(--amber)">Pipeline</div></div>`;
+    } else {
+      html=`<span class="sb-label-tag">${ag.name}</span>
+        <div class="sb-stat"><div class="sbs-l">Clients</div><div class="sbs-v">${ag.clients.length}</div></div>
+        <div class="sb-stat"><div class="sbs-l">Policies</div><div class="sbs-v">${polCnt}</div></div>
+        <div class="sb-stat"><div class="sbs-l">Total Coverage</div><div class="sbs-v">${fmt(totDB)}</div></div>
+        <div class="sb-stat"><div class="sbs-l">Monthly Premium</div><div class="sbs-v">$${totPm.toLocaleString()}/mo</div></div>
+        <div class="sb-stat"><div class="sbs-l">Commission to Date</div><div class="sbs-v coral">${fmtFull(totComm)}</div></div>
+        <div class="sb-stat"><div class="sbs-l">Prospects</div><div class="sbs-v">${ag.prospects.length}</div></div>
+        <div class="sb-spacer"></div>
+        <div class="sb-stat"><div class="sbs-l">Proposed Pipeline</div><div class="sbs-v" style="color:var(--amber)">${fmt(prospDB)}</div></div>`;
+    }
+  } else {
+    const c=D.clients[curClient];
+    const t=D.trusts[curClient];
+    const pols=c.policies.map(pid=>({id:pid,...D.policies[pid]}));
+    const totDB=pols.reduce((s,p)=>s+p.db,0);
+    const totPm=pols.reduce((s,p)=>s+(p.freq==='Monthly'?p.pm:0),0);
+    const cashVal=pols.reduce((s,p)=>s+(p.cashVal||0),0);
+    if(context==='client-trust') {
+      const matched=t?t.assets.filter(a=>a.matches).length:0;
+      const total=t?t.assets.length:0;
+      html=`<span class="sb-label-tag">${c.name} · Trust</span>
+        <div class="sb-stat"><div class="sbs-l">Trust Name</div><div class="sbs-v" style="font-size:11px">${t?t.name:'—'}</div></div>
+        <div class="sb-stat"><div class="sbs-l">Date Formed</div><div class="sbs-v" style="font-size:12px">${t?t.formed:'—'}</div></div>
+        <div class="sb-stat"><div class="sbs-l">Last Amended</div><div class="sbs-v" style="font-size:12px">${t?t.lastAmended:'—'}</div></div>
+        <div class="sb-stat"><div class="sbs-l">Assets in Trust</div><div class="sbs-v coral">${matched} of ${total}</div></div>
+        <div class="sb-spacer"></div>
+        <div class="sb-stat"><div class="sbs-l">Cert on File</div><div class="sbs-v" style="color:${t&&t.certOnFile?'var(--green)':'var(--coral)'}">${t&&t.certOnFile?'✅ Yes':'⚠️ No'}</div></div>`;
+    } else {
+      html=`<span class="sb-label-tag">${c.name}</span>
+        <div class="sb-stat"><div class="sbs-l">Policies</div><div class="sbs-v">${pols.length}</div></div>
+        <div class="sb-stat"><div class="sbs-l">Total Coverage</div><div class="sbs-v">${fmt(totDB)}</div></div>
+        <div class="sb-stat"><div class="sbs-l">Monthly Premium</div><div class="sbs-v">${totPm>0?'$'+totPm.toLocaleString()+'/mo':'Annual'}</div></div>
+        ${cashVal>0?`<div class="sb-stat"><div class="sbs-l">Total Cash Value</div><div class="sbs-v coral">$${cashVal.toLocaleString()}</div></div>`:''}
+        <div class="sb-stat"><div class="sbs-l">Carriers</div><div class="sbs-v">${[...new Set(pols.map(p=>p.carrier))].length}</div></div>
+        <div class="sb-spacer"></div>
+        <div class="sb-stat"><div class="sbs-l">Beneficiaries</div><div class="sbs-v">${D.beneficiaries[curClient].length} named</div></div>`;
+    }
+  }
+  bar.innerHTML=html;
+}
+
+// ═══════════ LICENSING ═══════════
+function renderLicensing() {
+  const ag = D.agents[curAgent];
+  document.getElementById('lic-title').textContent = ag.name + ' — Licensing';
+
+  const licData = {
+    scott: {
+      licenses:[
+        { type:'Life & Health — California', num:'0K88421', issued:'Mar 2019', expires:'Mar 2027', status:'Active', daysLeft:395 },
+        { type:'Life & Health — Nevada',     num:'NV-34892', issued:'Jun 2021', expires:'Jun 2025', status:'Expiring Soon', daysLeft:90 },
+        { type:'Variable Products — FINRA',  num:'S7-224881', issued:'Aug 2020', expires:'N/A',    status:'Active', daysLeft:null },
+      ],
+      ce:{ required:24, completed:18, deadline:'Dec 31, 2026', courses:[
+        { name:'Ethics in Insurance Practice', hours:4, completed:true, date:'Jan 2026' },
+        { name:'Long-Term Care Products', hours:6, completed:true, date:'Oct 2025' },
+        { name:'Annuity Suitability', hours:4, completed:true, date:'Aug 2025' },
+        { name:'Life Insurance Product Updates 2026', hours:4, completed:true, date:'Mar 2026' },
+        { name:'Anti-Money Laundering', hours:3, completed:true, date:'Feb 2026' },
+        { name:'Advanced Estate Planning', hours:6, completed:false, date:null },
+      ]},
+      appointments:[
+        { carrier:'Guardian', apptDate:'Sep 2020', status:'Active', lines:'Life, Disability', renewalDate:'Annual' },
+        { carrier:'New York Life', apptDate:'Mar 2021', status:'Active', lines:'Life, Annuities', renewalDate:'Annual' },
+        { carrier:'MassMutual', apptDate:'Jan 2022', status:'Active', lines:'Life, Long-Term Care', renewalDate:'Annual' },
+        { carrier:'Pacific Life', apptDate:'Jun 2023', status:'Active', lines:'Life, Annuities, UL', renewalDate:'Annual' },
+        { carrier:'Prudential', apptDate:'Nov 2019', status:'Active', lines:'Life, Variable', renewalDate:'Annual' },
+      ]
+    },
+    anthony: {
+      licenses:[
+        { type:'Life & Health — California', num:'0F22817', issued:'Feb 2017', expires:'Feb 2027', status:'Active', daysLeft:365 },
+        { type:'Life & Health — Arizona',    num:'AZ-19934', issued:'Sep 2022', expires:'Sep 2026', status:'Active', daysLeft:210 },
+        { type:'Variable Products — FINRA',  num:'S7-118834', issued:'May 2018', expires:'N/A',   status:'Active', daysLeft:null },
+      ],
+      ce:{ required:24, completed:24, deadline:'Dec 31, 2026', courses:[
+        { name:'Ethics in Insurance Practice', hours:4, completed:true, date:'Dec 2025' },
+        { name:'Annuity Suitability', hours:4, completed:true, date:'Nov 2025' },
+        { name:'PPLI and Advanced Products', hours:6, completed:true, date:'Sep 2025' },
+        { name:'Anti-Money Laundering', hours:3, completed:true, date:'Jul 2025' },
+        { name:'Life Insurance Product Updates 2026', hours:4, completed:true, date:'Feb 2026' },
+        { name:'Advanced Estate Planning', hours:6, completed:true, date:'Jan 2026' },
+      ]},
+      appointments:[
+        { carrier:'Guardian', apptDate:'Jun 2018', status:'Active', lines:'Life, Disability, LTC', renewalDate:'Annual' },
+        { carrier:'New York Life', apptDate:'Jun 2018', status:'Active', lines:'Life, Annuities', renewalDate:'Annual' },
+        { carrier:'MassMutual', apptDate:'Aug 2019', status:'Active', lines:'Life, Annuities, LTC', renewalDate:'Annual' },
+        { carrier:'Prudential', apptDate:'Jan 2020', status:'Active', lines:'Life, Variable', renewalDate:'Annual' },
+        { carrier:'AIG', apptDate:'Mar 2021', status:'Active', lines:'Life, UL, Variable', renewalDate:'Annual' },
+      ]
+    },
+    rainmaker: {
+      licenses:[
+        { type:'Life & Health — California', num:'0M44219', issued:'Oct 2022', expires:'Oct 2026', status:'Active', daysLeft:240 },
+        { type:'Variable Products — FINRA',  num:'S7-334421', issued:'Feb 2023', expires:'N/A',   status:'Active', daysLeft:null },
+      ],
+      ce:{ required:24, completed:10, deadline:'Dec 31, 2026', courses:[
+        { name:'Ethics in Insurance Practice', hours:4, completed:true, date:'Mar 2026' },
+        { name:'Anti-Money Laundering', hours:3, completed:true, date:'Jan 2026' },
+        { name:'Annuity Suitability', hours:3, completed:true, date:'Nov 2025' },
+        { name:'Life Insurance Product Updates 2026', hours:4, completed:false, date:null },
+        { name:'PPLI and Advanced Products', hours:6, completed:false, date:null },
+        { name:'Advanced Estate Planning', hours:6, completed:false, date:null },
+      ]},
+      appointments:[
+        { carrier:'Guardian', apptDate:'Nov 2022', status:'Active', lines:'Life, Disability', renewalDate:'Annual' },
+        { carrier:'New York Life', apptDate:'Nov 2022', status:'Active', lines:'Life, Annuities', renewalDate:'Annual' },
+        { carrier:'MassMutual', apptDate:'Feb 2023', status:'Active', lines:'Life, LTC', renewalDate:'Annual' },
+        { carrier:'Pacific Life', apptDate:'Jun 2023', status:'Pending Renewal', lines:'Life, UL', renewalDate:'Jun 2026' },
+      ]
+    }
+  };
+  const ld = licData[curAgent];
+  const cePct = Math.round((ld.ce.completed / ld.ce.required) * 100);
+
+  document.getElementById('lic-content').innerHTML = `
+    <!-- LICENSE CARDS -->
+    <div class="sec-hdr"><span class="sec-title">Agent Licenses</span></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px">
+      ${ld.licenses.map(l=>`
+        <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:18px 20px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+            <div style="font-size:12px;font-weight:600;color:var(--navy);line-height:1.3;max-width:160px">${l.type}</div>
+            <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;
+              background:${l.status==='Active'?'var(--green-light)':l.status==='Expiring Soon'?'var(--amber-light)':'var(--blue-light)'};
+              color:${l.status==='Active'?'#166534':l.status==='Expiring Soon'?'#92400e':'#1d4ed8'}">${l.status}</span>
+          </div>
+          <div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">License #: <span style="color:var(--navy);font-weight:500">${l.num}</span></div>
+          <div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">Issued: <span style="color:var(--gray-600)">${l.issued}</span></div>
+          <div style="font-size:11px;color:var(--gray-400)">Expires: <span style="color:${l.daysLeft&&l.daysLeft<180?'var(--coral)':'var(--gray-600)'}; font-weight:${l.daysLeft&&l.daysLeft<180?'600':'400'}">${l.expires}${l.daysLeft?` · ${l.daysLeft} days`:''}</span></div>
+        </div>`).join('')}
+    </div>
+
+    <!-- CE CREDITS -->
+    <div class="sec-hdr"><span class="sec-title">Continuing Education Credits</span><span style="font-size:11px;color:var(--gray-400)">Deadline: ${ld.ce.deadline}</span></div>
+    <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:20px 24px;margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:20px;margin-bottom:18px">
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:600">CE Hours Completed</span>
+            <span style="font-size:13px;font-weight:700;color:${cePct>=100?'var(--green)':cePct>=60?'var(--blue)':'var(--coral)'}">${ld.ce.completed} / ${ld.ce.required} hours</span>
+          </div>
+          <div style="height:12px;background:var(--gray-100);border-radius:6px;overflow:hidden">
+            <div style="height:100%;width:${Math.min(100,cePct)}%;background:${cePct>=100?'var(--green)':cePct>=60?'var(--blue)':'var(--coral)'};border-radius:6px;transition:width .6s"></div>
+          </div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">${cePct}% complete · ${ld.ce.required-ld.ce.completed} hours remaining</div>
+        </div>
+        <div style="text-align:center;background:${cePct>=100?'var(--green-light)':'var(--amber-light)'};border-radius:var(--r);padding:14px 18px;min-width:90px">
+          <div style="font-family:var(--font-d);font-size:28px;color:${cePct>=100?'#166534':'#92400e'}">${cePct}%</div>
+          <div style="font-size:10px;font-weight:600;color:${cePct>=100?'#166534':'#92400e'}">${cePct>=100?'Complete':'In Progress'}</div>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:var(--offwhite)">
+          <th style="padding:8px 14px;text-align:left;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);border-bottom:1px solid var(--gray-200)">Course</th>
+          <th style="padding:8px 14px;text-align:center;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);border-bottom:1px solid var(--gray-200)">Hours</th>
+          <th style="padding:8px 14px;text-align:center;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);border-bottom:1px solid var(--gray-200)">Status</th>
+          <th style="padding:8px 14px;text-align:right;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);border-bottom:1px solid var(--gray-200)">Completed</th>
+        </tr></thead>
+        <tbody>
+          ${ld.ce.courses.map(c=>`<tr style="border-bottom:1px solid var(--gray-100)">
+            <td style="padding:10px 14px;font-size:12px">${c.name}</td>
+            <td style="padding:10px 14px;text-align:center;font-size:12px;font-weight:600">${c.hours}</td>
+            <td style="padding:10px 14px;text-align:center">${c.completed?'<span style="color:var(--green);font-size:16px">✅</span>':'<span style="color:var(--gray-400);font-size:16px">⏳</span>'}</td>
+            <td style="padding:10px 14px;text-align:right;font-size:11px;color:var(--gray-600)">${c.date||'—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CARRIER APPOINTMENTS -->
+    <div class="sec-hdr"><span class="sec-title">Carrier Appointments</span><span style="font-size:11px;color:var(--gray-400)">${ld.appointments.length} carriers</span></div>
+    <div style="display:grid;grid-template-columns:repeat(${Math.min(ld.appointments.length,3)},1fr);gap:12px">
+      ${ld.appointments.map(a=>`
+        <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:16px 18px;display:flex;align-items:flex-start;gap:12px">
+          <div style="width:40px;height:40px;border-radius:var(--rs);background:var(--navy);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span style="color:white;font-size:11px;font-weight:700">${a.carrier.split(' ').map(w=>w[0]).join('').slice(0,3)}</span>
+          </div>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:13px;color:var(--navy)">${a.carrier}</div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:2px">Lines: ${a.lines}</div>
+            <div style="font-size:11px;color:var(--gray-400)">Appointed: ${a.apptDate}</div>
+            <div style="margin-top:6px">
+              <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;
+                background:${a.status==='Active'?'var(--green-light)':'var(--amber-light)'};
+                color:${a.status==='Active'?'#166534':'#92400e'}">${a.status}</span>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ═══════════ GOD VIEW ═══════════
+let godCharts = {};
+
+function renderGodDashboard() {
+  const el = document.getElementById('god-dashboard-content');
+  el.innerHTML = `
+    <!-- COMPANY OVERVIEW HERO STATS -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px">
+      ${[
+        { label:'Locations', val:'27', sub:'Nationwide', icon:'📍' },
+        { label:'Total Agents', val:'54', sub:'Active producers', icon:'👥' },
+        { label:'Total Clients', val:'15,000+', sub:'In-force', icon:'🤝' },
+        { label:'Policies In Force', val:'20,000+', sub:'Active policies', icon:'📋' },
+        { label:'Total Coverage', val:'$10B+', sub:'Death benefit', icon:'🛡️' },
+        { label:'Annual Premium', val:'$100M+', sub:'Recurring', icon:'💵' },
+      ].map(s=>`
+        <div style="background:var(--navy);border-radius:var(--r);padding:16px 18px;border:1px solid rgba(255,255,255,.08)">
+          <div style="font-size:18px;margin-bottom:6px">${s.icon}</div>
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);margin-bottom:4px">${s.label}</div>
+          <div style="font-family:var(--font-d);font-size:22px;color:white">${s.val}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px">${s.sub}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- TODAY LIVE METRICS -->
+    <div class="sec-hdr"><span class="sec-title">⚡ Today — Live Metrics</span><span style="font-size:11px;color:var(--green)">● Live · Feb 26, 2026</span></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+      ${[
+        { label:"Today's Appointments", val:'324', sub:'Across all locations', color:'var(--blue)', bg:'var(--blue-light)' },
+        { label:"Today's Applications", val:'108', sub:'Submitted today', color:'var(--purple)', bg:'var(--purple-light)' },
+        { label:"Policies Issued Today", val:'42', sub:'Placed in force', color:'var(--green)', bg:'var(--green-light)' },
+        { label:"Today's Revenue", val:'$189,000', sub:'Gross premium', color:'var(--coral)', bg:'var(--coral-pale)' },
+      ].map(s=>`
+        <div style="background:${s.bg};border-radius:var(--r);padding:18px 20px;border:1px solid ${s.color}22">
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:${s.color};opacity:.8;margin-bottom:6px">${s.label}</div>
+          <div style="font-family:var(--font-d);font-size:28px;color:${s.color}">${s.val}</div>
+          <div style="font-size:11px;color:${s.color};opacity:.6;margin-top:3px">${s.sub}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- MTD / YTD PERFORMANCE -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:20px 24px">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:16px">📅 Month-to-Date Performance</div>
+        ${[
+          { label:'Policies Sold', val:'1,200', target:'1,111', pct:'108%', over:true },
+          { label:'Revenue',       val:'$5.4M', target:'$5.0M', pct:'108%', over:true },
+          { label:'New Clients',   val:'186', target:'180', pct:'103%', over:true },
+          { label:'Applications',  val:'2,160', target:'2,000', pct:'108%', over:true },
+        ].map(r=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--gray-100)">
+            <div style="font-size:12px;color:var(--gray-600)">${r.label}</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:13px;font-weight:700;color:var(--navy)">${r.val}</span>
+              <span style="font-size:10px;color:var(--gray-400)">vs ${r.target}</span>
+              <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:${r.over?'var(--green-light)':'var(--amber-light)'};color:${r.over?'#166534':'#92400e'}">${r.pct}</span>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:20px 24px">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:16px">📆 Year-to-Date Performance</div>
+        ${[
+          { label:'Policies Sold', val:'12,000', target:'10,714', pct:'112%', over:true },
+          { label:'Revenue',       val:'$54M',   target:'$48.2M', pct:'112%', over:true },
+          { label:'New Clients',   val:'1,860',  target:'1,620', pct:'115%', over:true },
+          { label:'Retention Rate',val:'94.2%',  target:'90%', pct:'✅',   over:true },
+        ].map(r=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--gray-100)">
+            <div style="font-size:12px;color:var(--gray-600)">${r.label}</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:13px;font-weight:700;color:var(--navy)">${r.val}</span>
+              <span style="font-size:10px;color:var(--gray-400)">vs ${r.target}</span>
+              <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--green-light);color:#166534">${r.pct}</span>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- TOP LOCATIONS -->
+    <div class="sec-hdr"><span class="sec-title">Top Locations — This Month</span></div>
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:14px">
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:var(--navy)">
+          <th style="padding:11px 18px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:rgba(255,255,255,.6)">#</th>
+          <th style="padding:11px 18px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:rgba(255,255,255,.6)">Location</th>
+          <th style="padding:11px 18px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:rgba(255,255,255,.6)">Agents</th>
+          <th style="padding:11px 18px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:rgba(255,255,255,.6)">Policies MTD</th>
+          <th style="padding:11px 18px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:rgba(255,255,255,.6)">Revenue MTD</th>
+          <th style="padding:11px 18px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:rgba(255,255,255,.6)">vs Target</th>
+        </tr></thead>
+        <tbody>
+          ${[
+            ['1','La Jolla, CA','6','148','$682,000','118%',true],
+            ['2','Del Mar, CA','5','124','$571,000','114%',true],
+            ['3','Encinitas, CA','4','108','$497,000','112%',true],
+            ['4','Beverly Hills, CA','5','118','$543,000','109%',true],
+            ['5','Dana Point, CA','6','102','$469,000','105%',true],
+            ['6','Laguna Beach, CA','8','134','$617,000','103%',true],
+            ['7','Malibu, CA','4','88','$405,000','99%',false],
+            ['8','Santa Barbara, CA','5','94','$432,000','97%',false],
+          ].map(([rank,loc,agents,pol,rev,pct,over])=>`
+            <tr style="border-bottom:1px solid var(--gray-100);${rank==='1'?'background:rgba(232,113,90,.04)':''}">
+              <td style="padding:11px 18px;font-weight:700;color:${rank==='1'?'var(--coral)':'var(--gray-400)'};">${rank}</td>
+              <td style="padding:11px 18px;font-weight:600;font-size:13px">${loc}</td>
+              <td style="padding:11px 18px;text-align:right;font-size:12px;color:var(--gray-600)">${agents}</td>
+              <td style="padding:11px 18px;text-align:right;font-weight:600">${pol}</td>
+              <td style="padding:11px 18px;text-align:right;font-weight:600;color:var(--navy)">${rev}</td>
+              <td style="padding:11px 18px;text-align:right"><span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:${over?'var(--green-light)':'var(--amber-light)'};color:${over?'#166534':'#92400e'}">${pct}</span></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+      <!-- GOD VIEW LIVE FEED -->
+      <div style="background:var(--navy);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;align-items:center">
+          <span style="color:white;font-weight:600;font-size:13px">⚡ Company Live Feed</span>
+          <span style="color:var(--green);font-size:10px;font-weight:600">● Live</span>
+        </div>
+        <div id="god-live-feed" style="overflow-y:auto;flex:1;max-height:340px"></div>
+      </div>
+    </div>`;
+  renderFeed('god-live-feed', FEED_EVENTS.slice(0,12), true);
+}
+
+function renderGodSales() {
+  document.getElementById('god-sales-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:20px 24px">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:16px">Policies Sold — Last 12 Months</div>
+        <canvas id="chart-policies" height="160"></canvas>
+      </div>
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:20px 24px">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:16px">Revenue — Last 12 Months ($M)</div>
+        <canvas id="chart-revenue" height="160"></canvas>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:20px 24px">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:16px">Product Mix — Policies In Force</div>
+        <canvas id="chart-mix" height="200"></canvas>
+      </div>
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:20px 24px">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:16px">Average Policy Size — Trend ($K)</div>
+        <canvas id="chart-avgsize" height="200"></canvas>
+      </div>
+    </div>`;
+
+  setTimeout(()=>{
+    const months = ['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'];
+    const policies = [820,890,950,1020,880,960,1100,1050,1180,1220,1090,1200];
+    const revenue = [3.7,4.0,4.3,4.6,4.0,4.3,5.0,4.7,5.3,5.5,4.9,5.4];
+
+    if(godCharts.policies) godCharts.policies.destroy();
+    godCharts.policies = new Chart(document.getElementById('chart-policies'), {
+      type:'line',
+      data:{ labels:months, datasets:[{
+        label:'Policies Sold', data:policies,
+        borderColor:'#E8715A', backgroundColor:'rgba(232,113,90,.1)',
+        tension:.4, fill:true, pointBackgroundColor:'#E8715A', pointRadius:4
+      }]},
+      options:{ responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:false, grid:{ color:'#f0f2f5' } } } }
+    });
+
+    if(godCharts.revenue) godCharts.revenue.destroy();
+    godCharts.revenue = new Chart(document.getElementById('chart-revenue'), {
+      type:'bar',
+      data:{ labels:months, datasets:[{
+        label:'Revenue ($M)', data:revenue,
+        backgroundColor:'rgba(59,130,246,.7)', borderColor:'#3b82f6', borderWidth:1, borderRadius:4
+      }]},
+      options:{ responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:false, grid:{ color:'#f0f2f5' } } } }
+    });
+
+    if(godCharts.mix) godCharts.mix.destroy();
+    godCharts.mix = new Chart(document.getElementById('chart-mix'), {
+      type:'doughnut',
+      data:{ labels:['Term Life','Whole Life','Universal Life','Premium Finance'],
+        datasets:[{ data:[45,28,20,7],
+          backgroundColor:['#3b82f6','#22c55e','#8b5cf6','#f59e0b'],
+          borderWidth:2, borderColor:'white' }]},
+      options:{ responsive:true, plugins:{ legend:{ position:'bottom' } }, cutout:'65%' }
+    });
+
+    if(godCharts.avgsize) godCharts.avgsize.destroy();
+    godCharts.avgsize = new Chart(document.getElementById('chart-avgsize'), {
+      type:'line',
+      data:{ labels:months, datasets:[{
+        label:'Avg Policy ($K)', data:[320,335,318,342,358,370,362,388,395,410,398,420],
+        borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,.1)',
+        tension:.4, fill:true, pointBackgroundColor:'#8b5cf6', pointRadius:4
+      }]},
+      options:{ responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:false, grid:{ color:'#f0f2f5' } } } }
+    });
+  }, 100);
+}
+
+function renderGodAgents() {
+  document.getElementById('god-agents-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:20px 24px">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:4px">🏆 Top 10 Agents — YTD</div>
+        <div style="font-size:11px;color:var(--gray-400);margin-bottom:16px">By policies sold · YTD 2026</div>
+        ${[
+          ['1','Anthony Mazzei','Del Mar, CA',91,'$418,000'],
+          ['2','Tina Fey','Beverly Hills, CA',88,'$404,800'],
+          ['3','Scott Travasos','Encinitas, CA',78,'$358,800'],
+          ['4','Eddie Murphy','Laguna Beach, CA',76,'$349,600'],
+          ['5','Rain Maker','La Jolla, CA',62,'$285,200'],
+          ['6','Maya Rudolph','Dana Point, CA',61,'$280,600'],
+          ['7','Bill Hader','Malibu, CA',59,'$271,400'],
+          ['8','Kenan Thompson','Santa Barbara, CA',57,'$262,200'],
+          ['9','Amy Poehler','Coronado, CA',55,'$253,000'],
+          ['10','Kate McKinnon','Carlsbad, CA',54,'$248,400'],
+        ].map(([rank,name,loc,pol,rev])=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
+            <span style="font-weight:700;font-size:12px;color:${rank==='1'?'var(--coral)':rank==='2'?'var(--amber)':rank==='3'?'var(--blue)':'var(--gray-400)'};min-width:18px">#${rank}</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600">${name}</div>
+              <div style="font-size:10px;color:var(--gray-400)">${loc}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:12px;font-weight:700;color:var(--navy)">${pol} policies</div>
+              <div style="font-size:10px;color:var(--green)">${rev}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:20px 24px">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:4px">📈 Needs Coaching — Bottom 10</div>
+        <div style="font-size:11px;color:var(--gray-400);margin-bottom:16px">Performance improvement opportunity · YTD 2026</div>
+        ${[
+          ['45','Chris Farley','Oceanside, CA',14,'$64,400'],
+          ['46','Molly Shannon','Ventura, CA',13,'$59,800'],
+          ['47','Will Forte','Oxnard, CA',13,'$59,800'],
+          ['48','Leslie Jones','Thousand Oaks',12,'$55,200'],
+          ['49','Fred Armisen','Pasadena, CA',11,'$50,600'],
+          ['50','Cecily Strong','Glendale, CA',11,'$50,600'],
+          ['51','Pete Davidson','Long Beach, CA',10,'$46,000'],
+          ['52','Nasim Pedrad','Irvine, CA',9,'$41,400'],
+          ['53','Jay Pharoah','Riverside, CA',8,'$36,800'],
+          ['54','Kristen Wiig','San Marcos, CA',6,'$27,600'],
+        ].map(([rank,name,loc,pol,rev])=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
+            <span style="font-weight:700;font-size:12px;color:var(--gray-400);min-width:18px">#${rank}</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600">${name}</div>
+              <div style="font-size:10px;color:var(--gray-400)">${loc}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:12px;font-weight:700;color:var(--coral)">${pol} policies</div>
+              <div style="font-size:10px;color:var(--gray-400)">${rev}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:20px 24px">
+      <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:16px">Agent Health Metrics</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+        ${[
+          { label:'Avg Policies/Agent', val:'222', sub:'YTD 2026', color:'var(--blue)' },
+          { label:'Turnover Rate', val:'8.2%', sub:'Last 12 months', color:'var(--green)' },
+          { label:'Avg Tenure', val:'4.1 yrs', sub:'Active agents', color:'var(--purple)' },
+          { label:'President\'s Club', val:'12', sub:'On track to qualify', color:'var(--coral)' },
+        ].map(s=>`
+          <div style="background:var(--offwhite);border-radius:var(--rs);padding:16px 18px;border:1px solid var(--gray-200)">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);margin-bottom:6px">${s.label}</div>
+            <div style="font-family:var(--font-d);font-size:26px;color:${s.color}">${s.val}</div>
+            <div style="font-size:11px;color:var(--gray-600);margin-top:2px">${s.sub}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function renderGodFinancial() {
+  document.getElementById('god-financial-content').innerHTML = `
+    <!-- REVENUE BLOCKS -->
+    <div class="sec-hdr"><span class="sec-title">Revenue Summary</span></div>
+    <div style="background:linear-gradient(135deg,#f43f5e,#e8715a);border-radius:var(--r);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;box-shadow:var(--sh-md)">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.65);margin-bottom:4px">Total Revenue — All Time</div>
+        <div style="font-family:var(--font-d);font-size:32px;color:white">$210,000,000+</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:rgba(255,255,255,.6)">27 locations · 54 agents · 20,000+ policies</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">Founded 2018 · 8 years in operation</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px">
+      ${[
+        { label:'MTD Revenue',        val:'$5.4M',  sub:'Feb 2026',           trend:'+8%' },
+        { label:'QTD Revenue',        val:'$10.8M', sub:'Q1 2026',            trend:'+12%' },
+        { label:'YTD Revenue',        val:'$54M',   sub:'Jan–Feb 2026',       trend:'+15%' },
+        { label:'Last 12 Months',     val:'$108M',  sub:'Mar 2025–Feb 2026',  trend:'+18%' },
+        { label:'Projected Next Q',   val:'$14.2M', sub:'Q2 2026 est.',       trend:'+8%' },
+        { label:'Projected Full Year', val:'$130M', sub:'2026 full yr est.',  trend:'+20%' },
+      ].map(b=>`
+        <div style="background:var(--navy);border-radius:var(--rs);padding:14px 16px;border:1px solid rgba(255,255,255,.08)">
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.4);margin-bottom:6px">${b.label}</div>
+          <div style="font-family:var(--font-d);font-size:18px;color:white">${b.val}</div>
+          <div style="font-size:10px;color:var(--green);margin-top:3px">${b.trend} YoY · ${b.sub}</div>
+        </div>`).join('')}
+    </div>
+    <!-- REVENUE BY PRODUCT -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:20px 24px">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:16px">Revenue by Product Type — YTD</div>
+        ${[
+          { type:'Whole Life', rev:'$24.3M', pct:45, color:'#22c55e' },
+          { type:'Universal Life', rev:'$14.6M', pct:27, color:'#8b5cf6' },
+          { type:'Premium Finance', rev:'$8.1M', pct:15, color:'#f59e0b' },
+          { type:'Term Life', rev:'$7.0M', pct:13, color:'#3b82f6' },
+        ].map(r=>`
+          <div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:12px;font-weight:500">${r.type}</span>
+              <span style="font-size:12px;font-weight:700;color:var(--navy)">${r.rev} <span style="color:var(--gray-400);font-weight:400">(${r.pct}%)</span></span>
+            </div>
+            <div style="height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden">
+              <div style="height:100%;width:${r.pct}%;background:${r.color};border-radius:4px"></div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div style="background:white;border-radius:var(--r);border:1px solid var(--gray-200);box-shadow:var(--sh-sm);padding:20px 24px">
+        <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:16px">Growth Rate Summary</div>
+        ${[
+          { label:'MoM Revenue Growth', val:'+8.1%', note:'Feb vs Jan 2026', good:true },
+          { label:'YoY Revenue Growth', val:'+18.4%', note:'Feb 2026 vs Feb 2025', good:true },
+          { label:'New Premium MoM', val:'+11.2%', note:'New business written', good:true },
+          { label:'Client Retention', val:'94.2%', note:'12-month rolling', good:true },
+          { label:'Policy Lapse Rate', val:'3.1%', note:'Below 5% target ✅', good:true },
+          { label:'Avg Premium Size', val:'$5,000/yr', note:'+$420 vs prior year', good:true },
+        ].map(r=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--gray-100)">
+            <div>
+              <div style="font-size:12px;font-weight:500">${r.label}</div>
+              <div style="font-size:10px;color:var(--gray-400)">${r.note}</div>
+            </div>
+            <span style="font-size:14px;font-weight:700;color:${r.good?'var(--green)':'var(--coral)'}">${r.val}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ═══════════ ACTIVITY FEED DATA ═══════════
+const FEED_EVENTS = [
+  { time:'2 min ago',  icon:'🎉', color:'#22c55e', bg:'#dcfce7', title:'Policy Issued',          body:'Iron Man — Guardian Whole Life $750K placed in force',              agent:'Anthony Mazzei', loc:'Del Mar' },
+  { time:'18 min ago', icon:'💵', color:'#22c55e', bg:'#dcfce7', title:'Premium Received',        body:'Batman — Prudential Whole Life $3,200/mo premium cleared',          agent:'Anthony Mazzei', loc:'Del Mar' },
+  { time:'34 min ago', icon:'🎉', color:'#22c55e', bg:'#dcfce7', title:'Policy Issued',           body:'Sydney Bristow — MassMutual Universal $5M policy activated',        agent:'Rain Maker',     loc:'La Jolla' },
+  { time:'52 min ago', icon:'⏰', color:'#e8715a', bg:'#fdf1ee', title:'Conversion Deadline',     body:'Thor — Pacific Life Term converts by Jun 2034. 8 yrs remaining.',   agent:'Scott Travasos', loc:'Encinitas' },
+  { time:'1 hr ago',   icon:'💵', color:'#22c55e', bg:'#dcfce7', title:'Premium Received',        body:'Wonder Woman — NY Life Whole Life $1,450/mo premium cleared',       agent:'Anthony Mazzei', loc:'Del Mar' },
+  { time:'2 hrs ago',  icon:'🎉', color:'#22c55e', bg:'#dcfce7', title:'Policy Issued',           body:'Rachel Green — Guardian Term $1M policy placed in force',           agent:'Rain Maker',     loc:'La Jolla' },
+  { time:'2 hrs ago',  icon:'📋', color:'#3b82f6', bg:'#dbeafe', title:'Policy Application',      body:'Padmé Amidala — $4.5M Guardian WL application submitted to carrier', agent:'Rain Maker',     loc:'La Jolla' },
+  { time:'3 hrs ago',  icon:'💵', color:'#22c55e', bg:'#dcfce7', title:'Premium Received',        body:'SpiderMan — MassMutual Term $125/mo premium cleared',               agent:'Scott Travasos', loc:'Encinitas' },
+  { time:'4 hrs ago',  icon:'⚠️', color:'#f59e0b', bg:'#fef3c7', title:'Term Expiry Alert',       body:'Superman — Lincoln Term $10M policy expires Apr 2052. Review now.', agent:'Scott Travasos', loc:'Encinitas' },
+  { time:'5 hrs ago',  icon:'🎉', color:'#22c55e', bg:'#dcfce7', title:'Policy Issued',           body:'Coach Taylor — Pacific Universal $2.5M policy activated',           agent:'Rain Maker',     loc:'La Jolla' },
+  { time:'6 hrs ago',  icon:'💵', color:'#22c55e', bg:'#dcfce7', title:'Premium Received',        body:'Iron Man — Prudential Term $190/mo premium cleared',                agent:'Scott Travasos', loc:'Encinitas' },
+  { time:'7 hrs ago',  icon:'📋', color:'#3b82f6', bg:'#dbeafe', title:'Policy Application',      body:'Poe Dameron — MassMutual Whole Life $2M application in underwriting',agent:'Rain Maker',     loc:'La Jolla' },
+  { time:'8 hrs ago',  icon:'⚠️', color:'#f59e0b', bg:'#fef3c7', title:'Conversion Deadline',     body:'SpiderMan — MassMutual Term converts by Jan 2035. Action needed.',  agent:'Scott Travasos', loc:'Encinitas' },
+  { time:'9 hrs ago',  icon:'💵', color:'#22c55e', bg:'#dcfce7', title:'Annual Premium Received', body:'Wolverine — Trust-Owned ILIT $310,000 annual premium cleared',      agent:'Anthony Mazzei', loc:'Del Mar' },
+];
+
+// Agent-filtered events (used by renderFeed)
+
+function renderFeed(containerId, events, dark=false) {
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML = events.map(e => `
+    <div class="feed-item" style="${dark?'border-color:rgba(255,255,255,.08)':''}">
+      <div style="width:28px;height:28px;border-radius:50%;background:${dark?'rgba(255,255,255,.1)':e.bg};display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">${e.icon}</div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600;color:${dark?'white':'var(--navy)'};">${e.title}</div>
+        <div style="font-size:11px;color:${dark?'rgba(255,255,255,.55)':'var(--gray-600)'};margin-top:2px;line-height:1.4">${e.body}</div>
+        <div style="font-size:10px;color:${dark?'rgba(255,255,255,.3)':'var(--gray-400)'};margin-top:3px">${e.time}${dark?' · '+e.loc:''}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════ NOTIFICATIONS ═══════════
+const NOTIF_EVENTS = [
+  { icon:'🎉', bg:'#dcfce7', title:'Policy Issued',          body:'Iron Man\'s Guardian Whole Life $750K is now in force. Commission posted.',              time:'2 min ago',  unread:true  },
+  { icon:'💵', bg:'#dcfce7', title:'Premium Received',       body:'Batman — Prudential Whole Life $3,200/mo cleared. Renewal commission queued.',           time:'18 min ago', unread:true  },
+  { icon:'📋', bg:'#dbeafe', title:'Application Submitted',  body:'Padmé Amidala\'s $4.5M application is with underwriting. Est. decision: 2 weeks.',       time:'34 min ago', unread:true  },
+  { icon:'⏰', bg:'#fdf1ee', title:'Conversion Deadline',    body:'Thor — Pacific Life Term converts by Jun 2034. Consider whole life illustration.',        time:'52 min ago', unread:true  },
+  { icon:'🎉', bg:'#dcfce7', title:'Policy Issued',          body:'Sydney Bristow\'s MassMutual Universal $5M policy is active. Commission posted.',         time:'1 hr ago',   unread:true  },
+  { icon:'⚠️', bg:'#fef3c7', title:'Term Expiry Alert',      body:'Superman — Lincoln $10M Term expires Apr 2052. Renewal conversation recommended.',        time:'4 hrs ago',  unread:false },
+  { icon:'📋', bg:'#dbeafe', title:'Policy Application',     body:'Poe Dameron — MassMutual Whole Life $2M application in underwriting review.',             time:'7 hrs ago',  unread:false },
+];
+
+let notifOpen = false;
+function toggleNotifications(e) {
+  e.stopPropagation();
+  notifOpen = !notifOpen;
+  document.getElementById('notif-dropdown').classList.toggle('open', notifOpen);
+  if(notifOpen) renderNotifList();
+}
+document.addEventListener('click', ()=>{ notifOpen=false; const d=document.getElementById('notif-dropdown'); if(d) d.classList.remove('open'); });
+
+function renderNotifList() {
+  document.getElementById('notif-list').innerHTML = NOTIF_EVENTS.map((n,i)=>`
+    <div class="notif-item ${n.unread?'unread':''}" onclick="markRead(${i})">
+      <div class="notif-icon" style="background:${n.bg}">${n.icon}</div>
+      <div class="notif-body">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-sub">${n.body}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+      ${n.unread?'<div class="notif-dot"></div>':''}
+    </div>`).join('');
+}
+
+function markRead(idx) {
+  NOTIF_EVENTS[idx].unread = false;
+  updateBadge();
+  renderNotifList();
+}
+
+function clearNotifications() {
+  NOTIF_EVENTS.forEach(n=>n.unread=false);
+  updateBadge();
+  renderNotifList();
+}
+
+function updateBadge() {
+  const count = NOTIF_EVENTS.filter(n=>n.unread).length;
+  const badge = document.getElementById('bell-badge');
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'flex' : 'none';
+}
+
+// ═══════════ CONVERSION MODAL ═══════════
+let pendingConvId = null;
+
+function openConvModal(pid) {
+  const p = D.prospects[pid];
+  pendingConvId = pid;
+  document.getElementById('conv-modal-title').textContent = `Convert ${p.name} to Client`;
+  document.getElementById('conv-modal-body').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:16px;background:var(--offwhite);border-radius:var(--rs)">
+      <div class="ca" style="background:${p.color};width:48px;height:48px;font-size:15px;font-weight:700">${p.initials}</div>
+      <div>
+        <div style="font-weight:700;font-size:16px">${p.name}</div>
+        <div style="font-size:12px;color:var(--gray-600);margin-top:2px">${p.primaryNeed}</div>
+        <div style="margin-top:6px"><span style="background:var(--green-light);color:#166534;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">Ready to Convert</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+      <div style="padding:14px 16px;background:var(--blue-light);border-radius:var(--rs);border:1px solid #bfdbfe">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:#1d4ed8;margin-bottom:4px">Proposed Coverage</div>
+        <div style="font-family:var(--font-d);font-size:22px;color:#1d4ed8">${fmt(p.desiredCoverage)}</div>
+      </div>
+      <div style="padding:14px 16px;background:var(--green-light);border-radius:var(--rs);border:1px solid #bbf7d0">
+        <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:#166534;margin-bottom:4px">Est. Premium</div>
+        <div style="font-size:16px;font-weight:700;color:#166534">${p.estPremRange}</div>
+      </div>
+    </div>
+    <div style="padding:14px 16px;background:var(--offwhite);border-radius:var(--rs);margin-bottom:16px">
+      <div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:8px">Carriers under consideration</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${p.carriersConsidered.map(c=>`<span style="background:white;border:1px solid var(--gray-200);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500">${c}</span>`).join('')}</div>
+    </div>
+    <div style="background:var(--amber-light);border:1px solid #fcd34d;border-radius:var(--rs);padding:12px 14px;font-size:12px;color:#92400e">
+      <strong>Next step after conversion:</strong> Policy application will be initiated, trust coordination with Ari Gold flagged, and ${p.name} will appear in your My Clients dashboard.
+    </div>`;
+  document.getElementById('conv-modal').classList.remove('hidden');
+}
+
+function closeConvModal() {
+  document.getElementById('conv-modal').classList.add('hidden');
+  pendingConvId = null;
+}
+
+function confirmConversion() {
+  if(!pendingConvId) return;
+  const p = D.prospects[pendingConvId];
+  closeConvModal();
+  launchConfetti();
+  showToast(`🎉 ${p.name} converted to client! Welcome aboard.`);
+  // Mark prospect as converted
+  p._converted = true;
+  // Add to activity feed
+  FEED_EVENTS.unshift({ time:'just now', icon:'🎉', color:'#22c55e', bg:'#dcfce7', title:'New Client Converted!', body:`${p.name} converted from prospect — ${fmt(p.desiredCoverage)} coverage pending placement`, agent:D.agents[curAgent].name, loc:'—' });
+  NOTIF_EVENTS.unshift({ icon:'🎉', bg:'#dcfce7', title:'New Client Converted!', body:`${p.name} is now a client. Initiate application and trust coordination.`, time:'just now', unread:true });
+  updateBadge();
+  // Re-render prospects with converted badge
+  setTimeout(()=>renderProspects(), 400);
+}
+
+function launchConfetti() {
+  const colors = ['#E8715A','#22c55e','#3b82f6','#f59e0b','#8b5cf6','#ffffff'];
+  for(let i=0;i<80;i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.cssText = `
+      left:${Math.random()*100}vw;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${6+Math.random()*8}px;
+      height:${6+Math.random()*8}px;
+      animation-duration:${1.5+Math.random()*2}s;
+      animation-delay:${Math.random()*0.5}s;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+    `;
+    document.body.appendChild(piece);
+    setTimeout(()=>piece.remove(), 4000);
+  }
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<span style="font-size:18px">🎉</span><span>${msg}</span>`;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(()=>t.remove(),400); }, 3500);
+}
+
+// ═══════════ INIT ═══════════
+renderClientView('ironman');
+renderOverview();
+document.getElementById('screen-agent-overview').classList.add('active');
+</script>
+</body>
+</html>
