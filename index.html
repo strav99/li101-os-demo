@@ -3274,7 +3274,7 @@ const TRUST = {
     },
     {
       id:'seinfeld', name:'Jerry Seinfeld', initials:'JS', color:'#0891b2',
-      estateValue: 12500000, lifeInsurance: 2000000, hasInsurance: true,
+      estateValue: 19500000, lifeInsurance: 3000000, hasInsurance: true,
       titlingIssues: 1, lastUpdated:'Jan 10, 2024',
       trust: 'Seinfeld Family Dynasty Trust', trustDate:'2014-11-20', amendedDate:'2024-01-10',
       successorTrustee:'Jessica Seinfeld', successorTrustee2:'Julian Seinfeld', coTrustee:'Jessica Seinfeld',
@@ -3769,6 +3769,100 @@ function renderTrustClientDetail(id) {
               <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span style="color:#22c55e">✓ In trust / designated</span><span style="font-weight:600;color:#22c55e">${titlingOk+titlingNa}</span></div>
               <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span style="color:#f59e0b">⚠ Needs Attention</span><span style="font-weight:600;color:#f59e0b">${titlingWarn}</span></div>
             </div>
+          </div>
+        </div>
+
+        <!-- Estate Tax Analysis Card -->
+        <div class="card">
+          <div class="card-hdr">Estate Tax Exposure</div>
+          <div class="card-body" style="padding:14px 16px">
+            ${(()=>{
+              const FED_EXEMPTION = 13610000;
+              const total = c.estateValue || 0;
+              const hasIlit = c.assets && c.assets.some(cat => cat.items && cat.items.some(it => it.titleName && it.titleName.toLowerCase().includes('ilit')));
+              const shielded = hasIlit ? (c.lifeInsurance || 0) : 0;
+              const taxable = total - shielded;
+              const shieldedPct = total > 0 ? Math.round(shielded / total * 100) : 0;
+              const taxablePct = 100 - shieldedPct;
+              const aboveExemption = Math.max(0, taxable - FED_EXEMPTION);
+              const fedTax = Math.round(aboveExemption * 0.40);
+              const headroom = Math.max(0, FED_EXEMPTION - taxable);
+              const headroomPct = Math.min(100, Math.round(taxable / FED_EXEMPTION * 100));
+              const belowThreshold = taxable < FED_EXEMPTION;
+              const fmt = v => '$' + (v >= 1000000 ? (v/1000000).toFixed(1).replace(/\.0$/,'')+'M' : v >= 1000 ? Math.round(v/1000)+'K' : v.toLocaleString());
+              const fmtFull = v => '$' + v.toLocaleString();
+              const W=160,H=160,CX=80,CY=80,R_OUTER=62,R_INNER=44,SW=13;
+              function arc(cx,cy,r,pct){
+                if(pct<=0) return '';
+                if(pct>=99.9) return '';
+                const a=pct/100*360, rad=(a-90)*Math.PI/180;
+                const x=cx+r*Math.cos(rad), y=cy+r*Math.sin(rad), lg=a>180?1:0;
+                return 'M '+cx+' '+(cy-r)+' A '+r+' '+r+' 0 '+lg+' 1 '+x.toFixed(1)+' '+y.toFixed(1);
+              }
+              const svgHtml='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'
+                +'<circle cx="'+CX+'" cy="'+CY+'" r="'+R_OUTER+'" fill="none" stroke="#dde3ea" stroke-width="'+SW+'"/>'
+                +'<circle cx="'+CX+'" cy="'+CY+'" r="'+R_INNER+'" fill="none" stroke="#dde3ea" stroke-width="'+(SW-2)+'"/>'
+                +(taxablePct>0&&taxablePct<100?'<path d="'+arc(CX,CY,R_OUTER,taxablePct)+'" fill="none" stroke="#0f2744" stroke-width="'+SW+'" stroke-linecap="round"/>'
+                  :taxablePct>=100?'<circle cx="'+CX+'" cy="'+CY+'" r="'+R_OUTER+'" fill="none" stroke="#0f2744" stroke-width="'+SW+'"/>':'')
+                +(shieldedPct>0&&shieldedPct<100?'<path d="'+arc(CX,CY,R_INNER,shieldedPct)+'" fill="none" stroke="#0d9488" stroke-width="'+(SW-2)+'" stroke-linecap="round"/>'
+                  :shieldedPct>=100?'<circle cx="'+CX+'" cy="'+CY+'" r="'+R_INNER+'" fill="none" stroke="#0d9488" stroke-width="'+(SW-2)+'"/>':'')
+                +(aboveExemption>0?'<path d="'+arc(CX,CY,R_OUTER,Math.round(aboveExemption/total*100))+'" fill="none" stroke="#e8715a" stroke-width="'+SW+'" stroke-linecap="round"/>':'')
+                +'<text x="'+CX+'" y="'+(CY-9)+'" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="system-ui">Total Estate</text>'
+                +'<text x="'+CX+'" y="'+(CY+8)+'" text-anchor="middle" font-size="13" fill="#0f2744" font-family="system-ui" font-weight="700">'+fmt(total)+'</text>'
+                +'</svg>';
+              const legendHtml='<div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">'
+                +'<div style="display:flex;align-items:center;gap:5px;font-size:10px"><span style="width:9px;height:9px;border-radius:2px;background:#0f2744;display:inline-block;flex-shrink:0"></span><span style="color:#475569">Taxable Estate</span></div>'
+                +(shieldedPct>0?'<div style="display:flex;align-items:center;gap:5px;font-size:10px"><span style="width:9px;height:9px;border-radius:2px;background:#0d9488;display:inline-block;flex-shrink:0"></span><span style="color:#475569">Shielded (ILIT)</span></div>':'')
+                +(aboveExemption>0?'<div style="display:flex;align-items:center;gap:5px;font-size:10px"><span style="width:9px;height:9px;border-radius:2px;background:#e8715a;display:inline-block;flex-shrink:0"></span><span style="color:#475569">Above Threshold</span></div>':'')
+                +'</div>';
+              const leftCol='<div style="display:flex;flex-direction:column;align-items:center">'+svgHtml+legendHtml+'</div>';
+              const bar=(pct,col)=>'<div style="height:4px;border-radius:3px;background:#e8edf2;overflow:hidden"><div style="height:100%;width:'+Math.min(pct,100)+'%;background:'+col+';border-radius:3px"></div></div>';
+              const p1='<div style="border-bottom:1px solid #e8edf2;padding-bottom:10px;margin-bottom:10px">'
+                +'<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;margin-bottom:2px">Estimated Total Estate</div>'
+                +'<div style="font-size:18px;font-weight:700;color:#0f2744;margin-bottom:5px">'+fmtFull(total)+'</div>'
+                +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:5px">'
+                  +'<div><div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="width:6px;height:6px;border-radius:50%;background:#0f2744;display:inline-block"></span>Taxable Estate</div><div style="font-weight:600;font-size:12px">'+fmtFull(taxable)+'</div></div>'
+                  +'<div><div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="width:6px;height:6px;border-radius:50%;background:#0d9488;display:inline-block"></span>Shielded (ILIT)</div><div style="font-weight:600;font-size:12px;color:'+(shielded>0?'#0d9488':'#94a3b8')+'">'+fmtFull(shielded)+'</div></div>'
+                +'</div>'
+                +bar(taxablePct,'#0f2744')
+                +'<div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:2px"><span>'+taxablePct+'%</span><span>'+shieldedPct+'%</span></div>'
+              +'</div>';
+              const p2='<div style="border-bottom:1px solid #e8edf2;padding-bottom:10px;margin-bottom:10px">'
+                +'<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;margin-bottom:2px">Estimated Federal Estate Tax</div>'
+                +'<div style="font-size:18px;font-weight:700;color:'+(fedTax>0?'#e8715a':'#16a34a')+';margin-bottom:5px">'+(fedTax>0?fmtFull(fedTax):'$0')+'</div>'
+                +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:5px">'
+                  +(fedTax>0
+                    ?'<div><div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="width:6px;height:6px;border-radius:50%;background:#e8715a;display:inline-block"></span>Above Exemption</div><div style="font-weight:600;font-size:12px;color:#e8715a">'+fmtFull(aboveExemption)+'</div></div>'
+                     +'<div><div style="font-size:9px;color:#64748b;margin-bottom:1px">Tax Rate Applied</div><div style="font-weight:600;font-size:12px">40% federal</div></div>'
+                    :'<div style="grid-column:span 2"><div style="font-size:10px;color:#16a34a;font-weight:500">No federal estate tax — below '+fmt(FED_EXEMPTION)+' threshold</div></div>'
+                  )
+                +'</div>'
+                +bar(fedTax>0?100:headroomPct, fedTax>0?'#e8715a':'#16a34a')
+              +'</div>';
+              const p3='<div style="border-bottom:1px solid #e8edf2;padding-bottom:10px;margin-bottom:10px">'
+                +'<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;margin-bottom:2px">Federal Exemption Used — '+fmtFull(FED_EXEMPTION)+'</div>'
+                +'<div style="font-size:18px;font-weight:700;color:'+(belowThreshold?'#0369a1':'#e8715a')+';margin-bottom:5px">'+fmtFull(Math.min(taxable,FED_EXEMPTION))+'</div>'
+                +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:5px">'
+                  +'<div><div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="width:6px;height:6px;border-radius:50%;background:#0369a1;display:inline-block"></span>Exemption Used</div><div style="font-weight:600;font-size:12px">'+fmtFull(Math.min(taxable,FED_EXEMPTION))+'</div></div>'
+                  +'<div><div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="width:6px;height:6px;border-radius:50%;background:#16a34a;display:inline-block"></span>Remaining</div><div style="font-weight:600;font-size:12px;color:'+(headroom>0?'#16a34a':'#e8715a')+'">'+fmtFull(headroom)+'</div></div>'
+                +'</div>'
+                +bar(headroomPct, belowThreshold?'#0369a1':'#e8715a')
+                +'<div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:2px"><span>'+headroomPct+'% used</span><span>'+(100-Math.min(headroomPct,100))+'% remaining</span></div>'
+              +'</div>';
+              const p4=!hasIlit
+                ?'<div style="padding:8px 10px;border-radius:6px;background:rgba(13,148,136,.06);border:1px solid rgba(13,148,136,.25)">'
+                  +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#0d9488;margin-bottom:4px">💡 Planning Opportunity</div>'
+                  +'<div style="font-size:10px;color:#334155;line-height:1.5">No ILIT in place. Life insurance proceeds currently sit inside the taxable estate. An ILIT could move these outside the estate, reducing taxable exposure'+(fedTax>0?' and the '+fmtFull(fedTax)+' tax bill':' and protecting against future law changes')+'.</div>'
+                +'</div>'
+                :aboveExemption>0
+                  ?'<div style="padding:8px 10px;border-radius:6px;background:rgba(232,113,90,.06);border:1px solid rgba(232,113,90,.3)">'
+                    +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#e8715a;margin-bottom:4px">⚠ Above Threshold</div>'
+                    +'<div style="font-size:10px;color:#334155;line-height:1.5">'+fmtFull(aboveExemption)+' exceeds the federal exemption, generating an estimated '+fmtFull(fedTax)+' estate tax. Consider expanding ILIT coverage or gifting strategies to reduce exposure.</div>'
+                  +'</div>'
+                  :'';
+              const rightCol='<div style="display:flex;flex-direction:column">'+p1+p2+p3+p4+'</div>';
+              return '<div style="display:grid;grid-template-columns:160px 1fr;gap:18px;align-items:start">'+leftCol+rightCol+'</div>';
+            })()}
           </div>
         </div>
 
