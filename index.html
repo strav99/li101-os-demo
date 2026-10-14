@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LI101 OS + Trust Platform — Investor Demo</title>
+<title>LI101 OS + Trust Platform — Demo</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -324,9 +324,9 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
 .cov-ratio-fill{height:100%;border-radius:4px;transition:width .6s ease}
 .trust-stat{background:white;border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh-sm);border:1px solid var(--gray-200);position:relative;overflow:hidden}
 .trust-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--teal-mid)}
-.trust-client-row{display:grid;grid-template-columns:minmax(0,1fr) 120px 100px 56px 80px;gap:0 8px;padding:0 18px;border-bottom:1px solid var(--gray-100);align-items:stretch;min-height:96px;font-size:13px;cursor:pointer;transition:background .12s}
+.trust-client-row{display:grid;grid-template-columns:minmax(0,1fr) 110px 90px 56px 80px;gap:0 10px;padding:12px 18px;border-bottom:1px solid var(--gray-100);align-items:center;font-size:13px;cursor:pointer;transition:background .12s}
 .trust-client-row:hover{background:rgba(13,148,136,.04)}
-.trust-client-row-hdr{display:grid;grid-template-columns:minmax(0,1fr) 120px 100px 56px 80px;gap:0 8px;padding:9px 18px;background:var(--gray-100);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400)}
+.trust-client-row-hdr{display:grid;grid-template-columns:minmax(0,1fr) 110px 90px 56px 80px;gap:0 10px;padding:9px 18px;background:var(--gray-100);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400)}
 </style>
 </head>
 <body>
@@ -338,10 +338,10 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
     <span class="logo-text">LI<span>101</span> OS</span>
   </a>
   <div class="view-switcher">
-    <button class="view-btn active" onclick="switchView('agent')">⚡ Agent View</button>
-    <button class="view-btn" onclick="switchView('client')">👤 Client View</button>
-    <button class="view-btn" onclick="switchView('god')" style="border-color:rgba(139,92,246,.5)">📊 Executive View</button>
-    <button class="view-btn" onclick="switchView('trust')" style="border-color:rgba(13,148,136,.5)">🏛 Trust View</button>
+    <button class="view-btn active" data-view="trust" onclick="switchView('trust')" style="border-color:rgba(13,148,136,.5)">🏛 Trust View</button>
+    <button class="view-btn" data-view="agent" onclick="switchView('agent')">⚡ Agent View</button>
+    <button class="view-btn" data-view="client" onclick="switchView('client')">👤 Client View</button>
+    <button class="view-btn" data-view="god" onclick="switchView('god')" style="border-color:rgba(139,92,246,.5)">📊 Executive View</button>
   </div>
   <div style="display:flex;align-items:center;gap:4px">
     <div class="bell-wrap" onclick="toggleNotifications(event)" id="bell-wrap">
@@ -352,11 +352,24 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
       <div class="notif-hdr"><span class="notif-hdr-t">🔔 Notifications</span><span class="notif-hdr-clr" onclick="clearNotifications()">Mark all read</span></div>
       <div id="notif-list"></div>
     </div>
-    <span class="nav-badge">Investor Demo</span>
+    <span class="nav-badge">Demo</span>
   </div>
 </nav>
 
 <!-- CONVERSION MODAL -->
+<div class="modal-overlay hidden" id="letter-modal">
+  <div class="modal-box" style="width:780px">
+    <div class="modal-hdr">
+      <span class="modal-title" id="letter-modal-title">Funding Letters</span>
+      <button class="modal-close" onclick="closeLetterModal()">✕</button>
+    </div>
+    <div class="modal-body" id="letter-modal-body" style="max-height:68vh;overflow:auto"></div>
+    <div class="modal-footer">
+      <span style="font-size:11px;color:var(--gray-400);margin-right:auto">Drafts for attorney review — edit before sending.</span>
+      <button class="btn btn-outline" onclick="closeLetterModal()">Close</button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay hidden" id="conv-modal">
   <div class="modal-box">
     <div class="modal-hdr">
@@ -386,7 +399,7 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
   </div>
   <div class="agent-sel" onclick="selectAgent('rainmaker')" id="asel-rainmaker">
     <div class="agent-name">Rain Maker</div>
-    <div class="agent-meta">La Jolla · 4 clients</div>
+    <div class="agent-meta">La Jolla · 2 clients</div>
   </div>
 
   <div class="sb-label">Navigation</div>
@@ -491,8 +504,6 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
   <div class="client-pill" onclick="selectClient('thor')" id="cpill-thor"><div class="ca" style="background:#e8715a">TH</div><span class="cpn">Thor</span></div>
   <div class="client-pill" onclick="selectClient('seinfeld')" id="cpill-seinfeld"><div class="ca" style="background:#0891b2">JS</div><span class="cpn">Jerry Seinfeld</span></div>
   <div class="client-pill" onclick="selectClient('taylor')" id="cpill-taylor"><div class="ca" style="background:#059669">CT</div><span class="cpn">Coach Taylor</span></div>
-  <div class="client-pill" onclick="selectClient('rachel')" id="cpill-rachel"><div class="ca" style="background:#db2777">RG</div><span class="cpn">Rachel Green</span></div>
-  <div class="client-pill" onclick="selectClient('sydney')" id="cpill-sydney"><div class="ca" style="background:#0891b2">SB</div><span class="cpn">Sydney Bristow</span></div>
   <div class="sb-label">My Estate</div>
   <div class="sb-item active" id="cnav-policies" onclick="clientNav('policies')">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
@@ -539,7 +550,7 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
   <div class="sb-item trust-nav-item" onclick="trustNav('tasks')" id="tnav-tasks">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H14.82C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
     My Tasks
-    <span style="margin-left:auto;background:rgba(13,148,136,.3);color:#5eead4;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px">3</span>
+    <span style="margin-left:auto;background:rgba(13,148,136,.3);color:#5eead4;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px">5</span>
   </div>
 
   <div class="sb-label" style="color:rgba(204,251,241,.35)">Demo Views</div>
@@ -908,7 +919,7 @@ const D = {
         ]
       }
     },
-    rainmaker: { name:'Rain Maker', clients:['seinfeld','taylor','rachel','sydney'], prospects:['kylo','poe','anakin','padme','boba','lando'],
+    rainmaker: { name:'Rain Maker', clients:['seinfeld','taylor'], prospects:['kylo','poe','anakin','padme','boba','lando'],
       equity:{
         grantDate:'January 10, 2023', vestingStart:'January 10, 2023',
         totalShares:40000, totalPct:0.4,
@@ -1010,40 +1021,27 @@ const D = {
         { cat:'Investment',    desc:'Fidelity — IRA',                     titleName:'Thor Odinson',                   matches:false },
         { cat:'Life Insurance',desc:'Pacific Life Term — POL001',         titleName:'Odinson Family Revocable Trust', matches:true  },
       ]},
-    seinfeld:    { name:'Seinfeld Family Irrevocable Trust', formed:'May 14, 2018', lastAmended:'January 20, 2025', certOnFile:true, attorney:'SoCal Coast Trust · Harvey Specter, Esq.',
+    seinfeld:    { name:'Seinfeld Family Revocable Trust', formed:'November 20, 2014', lastAmended:'January 10, 2024', certOnFile:true, attorney:'SoCal Coast Trust · Harvey Specter, Esq.',
       assets:[
-        { cat:'Real Estate',   desc:'Upper West Side Apt — New York, NY', titleName:'Seinfeld Family Irrevocable Trust', matches:true  },
-        { cat:'Real Estate',   desc:'Hamptons Summer Home — NY',          titleName:'Jerry Seinfeld',                    matches:false },
-        { cat:'Bank',          desc:'JPMorgan Chase — Private Banking',   titleName:'Seinfeld Family Irrevocable Trust', matches:true  },
-        { cat:'Investment',    desc:'Fidelity — Brokerage Account',       titleName:'Jerry Seinfeld',                    matches:false },
-        { cat:'Business',      desc:'Castle Rock Entertainment LLC',      titleName:'Seinfeld Family Irrevocable Trust', matches:true  },
-        { cat:'Life Insurance',desc:'Guardian Whole Life — POL013',       titleName:'Seinfeld Family Irrevocable Trust', matches:true  },
-        { cat:'Life Insurance',desc:'MassMutual Term — POL014',           titleName:'Seinfeld Family Irrevocable Trust', matches:true  },
+        { cat:'Real Estate',   desc:'Primary — NYC Upper West Side',       titleName:'Seinfeld Family Revocable Trust', matches:true  },
+        { cat:'Real Estate',   desc:'Hamptons Estate',                     titleName:'Seinfeld Family Revocable Trust', matches:true  },
+        { cat:'Real Estate',   desc:'LA Compound — Bel Air',               titleName:'Seinfeld Family Revocable Trust', matches:true  },
+        { cat:'Bank',          desc:'JP Morgan Private — Operating',       titleName:'Seinfeld Family Revocable Trust', matches:true  },
+        { cat:'Investment',    desc:'Goldman Sachs — Equity Portfolio',    titleName:'Seinfeld Family Revocable Trust', matches:true  },
+        { cat:'Business',      desc:'Seinfeld Productions LLC',            titleName:'Seinfeld Family Revocable Trust', matches:true  },
+        { cat:'Life Insurance',desc:'Guardian Whole Life — POL013',        titleName:'Seinfeld ILIT',                   matches:true  },
+        { cat:'Life Insurance',desc:'MassMutual Term 20 — POL014',         titleName:'Seinfeld ILIT',                   matches:true  },
+        { cat:'Vehicle',       desc:'Classic Car Collection (14 vehicles)', titleName:'Seinfeld LLC',                   matches:false },
       ]},
-    taylor:      { name:'Taylor Family Revocable Trust', formed:'August 1, 2019', lastAmended:'August 1, 2019', certOnFile:false, attorney:'SoCal Coast Trust · Harvey Specter, Esq.',
+    taylor:      { name:'Taylor Family Revocable Trust', formed:'May 10, 2018', lastAmended:'May 10, 2018', certOnFile:false, attorney:'SoCal Coast Trust · Harvey Specter, Esq.',
       assets:[
-        { cat:'Real Estate',   desc:'Dillon TX Residence',                titleName:'Eric Taylor',                     matches:false },
-        { cat:'Bank',          desc:'First National Bank — Checking',     titleName:'Taylor Family Revocable Trust',   matches:true  },
-        { cat:'Investment',    desc:'Vanguard — Retirement Account',      titleName:'Eric Taylor',                     matches:false },
-        { cat:'Life Insurance',desc:'NY Life Whole Life — POL015',        titleName:'Taylor Family Revocable Trust',   matches:true  },
-        { cat:'Life Insurance',desc:'Pacific Universal — POL016',         titleName:'Taylor Family Revocable Trust',   matches:true  },
-      ]},
-    rachel:      { name:'Green Family Irrevocable Trust', formed:'April 3, 2022', lastAmended:'November 12, 2024', certOnFile:true, attorney:'SoCal Coast Trust · Harvey Specter, Esq.',
-      assets:[
-        { cat:'Real Estate',   desc:'Upper East Side Condo — New York',   titleName:'Green Family Irrevocable Trust',  matches:true  },
-        { cat:'Bank',          desc:'Bank of America — Personal',         titleName:'Rachel Green',                    matches:false },
-        { cat:'Investment',    desc:'Schwab — Investment Account',        titleName:'Green Family Irrevocable Trust',  matches:true  },
-        { cat:'Life Insurance',desc:'Guardian Term — POL017',             titleName:'Green Family Irrevocable Trust',  matches:true  },
-        { cat:'Life Insurance',desc:'Northwestern WL — POL018',           titleName:'Green Family Irrevocable Trust',  matches:true  },
-      ]},
-    sydney:      { name:'Bristow Irrevocable Trust', formed:'February 28, 2017', lastAmended:'March 5, 2023', certOnFile:true, attorney:'SoCal Coast Trust · Harvey Specter, Esq.',
-      assets:[
-        { cat:'Real Estate',   desc:'Los Angeles Residence — LA, CA',     titleName:'Bristow Irrevocable Trust',       matches:true  },
-        { cat:'Bank',          desc:'Wells Fargo — Operative Account',    titleName:'Sydney Bristow',                  matches:false },
-        { cat:'Investment',    desc:'Goldman Sachs — Managed Portfolio',  titleName:'Bristow Irrevocable Trust',       matches:true  },
-        { cat:'Business',      desc:'APO Consulting LLC',                 titleName:'Sydney Bristow',                  matches:false },
-        { cat:'Life Insurance',desc:'MassMutual Universal — POL019',      titleName:'Bristow Irrevocable Trust',       matches:true  },
-      ]},
+        { cat:'Real Estate',   desc:'Primary — Austin, TX',                titleName:'Taylor Family RLT',               matches:true  },
+        { cat:'Real Estate',   desc:'Dillon, TX Ranch',                    titleName:'Eric Taylor',                     matches:false },
+        { cat:'Bank',          desc:'Texas Capital Bank — Checking',       titleName:'Taylor Family RLT',               matches:true  },
+        { cat:'Investment',    desc:'Charles Schwab — Brokerage',          titleName:'Taylor Family RLT',               matches:true  },
+        { cat:'Life Insurance',desc:'New York Life Whole Life — POL015',   titleName:'Taylor ILIT',                     matches:true  },
+        { cat:'Life Insurance',desc:'Pacific Life Universal — POL016',     titleName:'Taylor ILIT',                     matches:true  },
+      ]}
   },
   clients: {
     thor:        { name:'Thor',         agent:'scott',   avatar:'TH', color:'#e8715a', policies:['P01'] },
@@ -1055,9 +1053,7 @@ const D = {
     hulk:        { name:'Hulk',         agent:'anthony', avatar:'HK', color:'#27ae60', policies:['P11'] },
     wolverine:   { name:'Wolverine',    agent:'anthony', avatar:'WO', color:'#d4a017', policies:['P12'] },
     seinfeld:    { name:'Jerry Seinfeld', agent:'rainmaker', avatar:'JS', color:'#0891b2', policies:['P13','P14'] },
-    taylor:      { name:'Coach Taylor',   agent:'rainmaker', avatar:'CT', color:'#059669', policies:['P15','P16'] },
-    rachel:      { name:'Rachel Green',   agent:'rainmaker', avatar:'RG', color:'#0d9488', policies:['P17','P18'] },
-    sydney:      { name:'Sydney Bristow', agent:'rainmaker', avatar:'SB', color:'#0891b2', policies:['P19'] }
+    taylor:      { name:'Coach Taylor',   agent:'rainmaker', avatar:'CT', color:'#059669', policies:['P15','P16'] }
   },
   policies: {
     P01:{ carrier:'Pacific Life',         type:'Term 30',        tt:'term',  db:5000000,  pm:420,    freq:'Monthly', eff:'Jun 2024', end:'Jun 2054', conv:'Jun 2034', status:'Active', emoji:'🛡️', cashVal:0,       commRate:.05,  commYrs:1  },
@@ -1075,10 +1071,7 @@ const D = {
     P13:{ carrier:'Guardian',             type:'Whole Life',     tt:'whole', db:7500000,  pm:8400,   freq:'Monthly', eff:'Mar 2023', end:'Mar 2100', conv:null,        status:'Active', emoji:'🏛️', cashVal:168000,  commRate:.55,  commYrs:2  },
     P14:{ carrier:'MassMutual',           type:'Term 20',        tt:'term',  db:10000000, pm:780,    freq:'Monthly', eff:'Mar 2023', end:'Mar 2043', conv:'Mar 2033', status:'Active', emoji:'🛡️', cashVal:0,       commRate:.05,  commYrs:2  },
     P15:{ carrier:'New York Life',        type:'Whole Life',     tt:'whole', db:6000000,  pm:7200,   freq:'Monthly', eff:'Aug 2022', end:'Aug 2099', conv:null,        status:'Active', emoji:'🏛️', cashVal:216000,  commRate:.55,  commYrs:3  },
-    P16:{ carrier:'Pacific Life',         type:'Universal Life', tt:'univ',  db:10000000, pm:6200,   freq:'Monthly', eff:'Aug 2022', end:'Aug 2099', conv:null,        status:'Active', emoji:'⚡', cashVal:111600,  commRate:.45,  commYrs:3  },
-    P17:{ carrier:'Guardian',             type:'Term 30',        tt:'term',  db:5000000,  pm:385,    freq:'Monthly', eff:'Nov 2024', end:'Nov 2054', conv:'Nov 2034', status:'Active', emoji:'🛡️', cashVal:0,       commRate:.05,  commYrs:1  },
-    P18:{ carrier:'Northwestern Mutual',  type:'Whole Life',     tt:'whole', db:3500000,  pm:4100,   freq:'Monthly', eff:'Nov 2024', end:'Sep 2116', conv:null,        status:'Active', emoji:'🏛️', cashVal:49200,   commRate:.55,  commYrs:1  },
-    P19:{ carrier:'MassMutual',           type:'Universal Life', tt:'univ',  db:20000000, pm:15200,  freq:'Monthly', eff:'Jan 2021', end:'Jan 2099', conv:null,        status:'Active', emoji:'⚡', cashVal:729600,  commRate:.45,  commYrs:5  },
+    P16:{ carrier:'Pacific Life',         type:'Universal Life', tt:'univ',  db:10000000, pm:6200,   freq:'Monthly', eff:'Aug 2022', end:'Aug 2099', conv:null,        status:'Active', emoji:'⚡', cashVal:111600,  commRate:.45,  commYrs:3  }
   },
   prospects: {
     hansolo: {
@@ -1282,9 +1275,7 @@ const D = {
     hulk:        [{ name:'Betty Hulk',    rel:'Spouse', share:75 },{ name:'Kid Hulk',     rel:'Child', share:25 }],
     wolverine:   [{ name:'Jean Wolverine',rel:'Spouse', share:75 },{ name:'Kid Wolverine',rel:'Child', share:25 }],
     seinfeld:    [{ name:'Jessica Seinfeld', rel:'Spouse', share:70 },{ name:'Kid Seinfeld', rel:'Child', share:30 }],
-    taylor:      [{ name:'Tami Taylor',      rel:'Spouse', share:75 },{ name:'Kid Taylor',   rel:'Child', share:25 }],
-    rachel:      [{ name:'Monica Geller',    rel:'Sibling',share:50 },{ name:'Ross Geller',  rel:'Sibling',share:50 }],
-    sydney:      [{ name:'Jack Bristow',     rel:'Parent', share:60 },{ name:'Irina Derevko',rel:'Parent', share:40 }]
+    taylor:      [{ name:'Tami Taylor',      rel:'Spouse', share:75 },{ name:'Kid Taylor',   rel:'Child', share:25 }]
   },
   financeCase: [
     { client:'Hulk',     subtype:'PPLI', lender:'Private Bank A',  rateType:'Variable', rate:'7.10%', spread:'SOFR + 2.25%', annPrem:240000, down:60000,  loan:180000, term:'10 yrs', payment:'Interest-only', col:'Brokerage Account',  colVal:2500000, ltv:'70%', repay:'Refinance or unwind year 7',         stress:'10.50%', stressNote:'Serviceable with current brokerage assets', pol:'P11', trust:null },
@@ -1320,7 +1311,8 @@ function switchView(v) {
   curView = v;
   // Update nav buttons
   document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  const btn = document.querySelector('.view-btn[data-view="' + v + '"]');
+  if (btn) btn.classList.add('active');
   // Hide ALL screens first
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   // Show correct sidebar
@@ -2289,7 +2281,7 @@ function renderTrust(cid) {
       <span style="font-size:20px;flex-shrink:0">💡</span>
       <div>
         <div style="font-weight:600;font-size:13px;color:#92400e;margin-bottom:4px">Attorney Recommendation</div>
-        <div style="font-size:12px;color:#92400e">Assets marked ⬜ may not pass to your trust upon death — they could go through probate instead. Contact <strong>${t.attorney}</strong> to retitle these assets into your trust name. This is a quick process and ensures your estate plan works as intended.</div>
+        <div style="font-size:12px;color:#92400e">Assets marked ⬜ may not pass to your trust upon death — they could go through probate instead. Contact <strong>${t.attorney}</strong> about retitling these assets into the trust. Some transfers are simple; others (mortgaged property, LLC interests) need a closer look.</div>
       </div>
     </div>`;
 
@@ -3046,10 +3038,10 @@ function renderGodFinancial() {
 const FEED_EVENTS = [
   { time:'2 min ago',  icon:'🎉', color:'#22c55e', bg:'#dcfce7', title:'Policy Issued',          body:'Iron Man — Guardian Whole Life $750K placed in force',              agent:'Anthony Mazzei', loc:'Del Mar' },
   { time:'18 min ago', icon:'💵', color:'#22c55e', bg:'#dcfce7', title:'Premium Received',        body:'Batman — Prudential Whole Life $3,200/mo premium cleared',          agent:'Anthony Mazzei', loc:'Del Mar' },
-  { time:'34 min ago', icon:'🎉', color:'#22c55e', bg:'#dcfce7', title:'Policy Issued',           body:'Sydney Bristow — MassMutual Universal $5M policy activated',        agent:'Rain Maker',     loc:'La Jolla' },
+  { time:'34 min ago', icon:'🎉', color:'#22c55e', bg:'#dcfce7', title:'Policy Issued',           body:'Hulk — MassMutual Universal $5M policy activated',        agent:'Rain Maker',     loc:'La Jolla' },
   { time:'52 min ago', icon:'⏰', color:'#e8715a', bg:'#fdf1ee', title:'Conversion Deadline',     body:'Thor — Pacific Life Term converts by Jun 2034. 8 yrs remaining.',   agent:'Scott Travasos', loc:'Encinitas' },
   { time:'1 hr ago',   icon:'💵', color:'#22c55e', bg:'#dcfce7', title:'Premium Received',        body:'Wonder Woman — NY Life Whole Life $1,450/mo premium cleared',       agent:'Anthony Mazzei', loc:'Del Mar' },
-  { time:'2 hrs ago',  icon:'🎉', color:'#22c55e', bg:'#dcfce7', title:'Policy Issued',           body:'Rachel Green — Guardian Term $1M policy placed in force',           agent:'Rain Maker',     loc:'La Jolla' },
+  { time:'2 hrs ago',  icon:'🎉', color:'#22c55e', bg:'#dcfce7', title:'Policy Issued',           body:'Wolverine — Guardian Term $1M policy placed in force',           agent:'Rain Maker',     loc:'La Jolla' },
   { time:'2 hrs ago',  icon:'📋', color:'#3b82f6', bg:'#dbeafe', title:'Policy Application',      body:'Padmé Amidala — $4.5M Guardian WL application submitted to carrier', agent:'Rain Maker',     loc:'La Jolla' },
   { time:'3 hrs ago',  icon:'💵', color:'#22c55e', bg:'#dcfce7', title:'Premium Received',        body:'SpiderMan — MassMutual Term $125/mo premium cleared',               agent:'Scott Travasos', loc:'Encinitas' },
   { time:'4 hrs ago',  icon:'⚠️', color:'#f59e0b', bg:'#fef3c7', title:'Term Expiry Alert',       body:'Superman — Lincoln Term $10M policy expires Apr 2052. Review now.', agent:'Scott Travasos', loc:'Encinitas' },
@@ -3082,7 +3074,7 @@ const NOTIF_EVENTS = [
   { icon:'💵', bg:'#dcfce7', title:'Premium Received',       body:'Batman — Prudential Whole Life $3,200/mo cleared. Renewal commission queued.',           time:'18 min ago', unread:true  },
   { icon:'📋', bg:'#dbeafe', title:'Application Submitted',  body:'Padmé Amidala\'s $4.5M application is with underwriting. Est. decision: 2 weeks.',       time:'34 min ago', unread:true  },
   { icon:'⏰', bg:'#fdf1ee', title:'Conversion Deadline',    body:'Thor — Pacific Life Term converts by Jun 2034. Consider whole life illustration.',        time:'52 min ago', unread:true  },
-  { icon:'🎉', bg:'#dcfce7', title:'Policy Issued',          body:'Sydney Bristow\'s MassMutual Universal $5M policy is active. Commission posted.',         time:'1 hr ago',   unread:true  },
+  { icon:'🎉', bg:'#dcfce7', title:'Policy Issued',          body:'Hulk\'s MassMutual Universal $5M policy is active. Commission posted.',         time:'1 hr ago',   unread:true  },
   { icon:'⚠️', bg:'#fef3c7', title:'Term Expiry Alert',      body:'Superman — Lincoln $10M Term expires Apr 2052. Renewal conversation recommended.',        time:'4 hrs ago',  unread:false },
   { icon:'📋', bg:'#dbeafe', title:'Policy Application',     body:'Poe Dameron — MassMutual Whole Life $2M application in underwriting review.',             time:'7 hrs ago',  unread:false },
 ];
@@ -3218,10 +3210,12 @@ const TRUST = {
   clients: [
     {
       id:'pepper', name:'George Lucas', initials:'GL', color:'#0d9488',
+      state:'CA', spouse:'Amanda Lucas', trustee:'George Lucas',
       estateValue: 8200000, lifeInsurance: 500000, hasInsurance: true,
-      titlingIssues: 2, lastUpdated:'Apr 22, 2020',
+      lastUpdated:'Apr 22, 2020',
       trust: 'Lucas Family Revocable Living Trust', trustDate:'2016-03-15', amendedDate:'2020-04-22',
       successorTrustee:'Amanda Lucas', successorTrustee2:'Jett Lucas (age 22)', coTrustee:null,
+      docs: { trust:true, pourOver:true, cert:true, poa:true, ahcd:false },
       assets: [
         { category:'Real Estate', icon:'🏡', items:[
           { desc:'Primary Residence – San Anselmo', institution:'n/a', titleName:'Lucas Family RLT', value:'$4,200,000', titling:'ok', contact:'Coldwell Banker' },
@@ -3235,11 +3229,11 @@ const TRUST = {
           { desc:'Brokerage Portfolio', institution:'Fidelity', titleName:'Lucas Family RLT', value:'$1M+', titling:'ok', contact:'Michael Tran · (617) 555-0192' },
         ]},
         { category:'Retirement Accounts', icon:'🏦', items:[
-          { desc:'Traditional IRA', institution:'Vanguard', titleName:'George Lucas', value:'$250K–$1M', titling:'na', contact:'(800) 662-7447' },
-          { desc:'401(k) – Lucasfilm Ltd', institution:'Fidelity', titleName:'George Lucas', value:'$100K–$250K', titling:'na', contact:'HR: (800) 555-7800' },
+          { desc:'Traditional IRA', institution:'Vanguard', titleName:'George Lucas', value:'$250K–$1M', titling:'na', beneficiary:'Amanda Lucas', contact:'(800) 662-7447' },
+          { desc:'401(k) – Lucasfilm Ltd', institution:'Fidelity', titleName:'George Lucas', value:'$100K–$250K', titling:'na', beneficiary:'Amanda Lucas', contact:'HR: (800) 555-7800' },
         ]},
         { category:'Life Insurance', icon:'🛡️', items:[
-          { desc:'Whole Life – Pacific Life', institution:'Pacific Life', titleName:'Lucas Family ILIT', value:'$500,000', titling:'ok', contact:'LI101 · Scott Travasos' },
+          { desc:'Whole Life – Pacific Life', institution:'Pacific Life', titleName:'Lucas Family ILIT', value:'$500,000', titling:'ok', beneficiary:'Lucas Family ILIT', contact:'LI101 · Scott Travasos' },
         ]},
         { category:'Business Interests', icon:'🏢', items:[
           { desc:'Lucasfilm Ltd – Ownership Interest', institution:'Disney/Lucasfilm', titleName:'Lucas Family RLT', value:'$1M+', titling:'ok', contact:'Legal: (415) 555-0100' },
@@ -3251,10 +3245,12 @@ const TRUST = {
     },
     {
       id:'rachel', name:'Rachel Green', initials:'RG', color:'#0d9488',
+      state:'NY', spouse:null, trustee:'Rachel Green',
       estateValue: 1400000, lifeInsurance: 0, hasInsurance: false,
-      titlingIssues: 3, lastUpdated:'Mar 15, 2022',
+      lastUpdated:'Mar 15, 2022',
       trust: 'Green Family Revocable Trust', trustDate:'2022-03-15', amendedDate:'2022-03-15',
       successorTrustee:'Monica Geller', successorTrustee2:null, coTrustee:null,
+      docs: { trust:true, pourOver:false, cert:false, poa:false, ahcd:false },
       assets: [
         { category:'Real Estate', icon:'🏡', items:[
           { desc:'NYC Apartment – West Village', institution:'n/a', titleName:'Rachel Green (personal)', value:'$1,100,000', titling:'warn', contact:'Douglas Elliman' },
@@ -3267,17 +3263,19 @@ const TRUST = {
           { desc:'Brokerage – Ralph Lauren Vesting', institution:'Merrill Lynch', titleName:'Rachel Green (personal)', value:'$100K–$250K', titling:'warn', contact:'James Hoffman · (212) 555-0177' },
         ]},
         { category:'Retirement Accounts', icon:'🏦', items:[
-          { desc:'401(k) – Ralph Lauren', institution:'Fidelity', titleName:'Rachel Green', value:'Under $100K', titling:'na', contact:'HR: (212) 555-0180' },
+          { desc:'401(k) – Ralph Lauren', institution:'Fidelity', titleName:'Rachel Green', value:'Under $100K', titling:'na', beneficiary:null, contact:'HR: (212) 555-0180' },
         ]},
         { category:'Life Insurance', icon:'🛡️', items:[] },
       ]
     },
     {
       id:'seinfeld', name:'Jerry Seinfeld', initials:'JS', color:'#0891b2',
-      estateValue: 19500000, lifeInsurance: 3000000, hasInsurance: true,
-      titlingIssues: 1, lastUpdated:'Jan 10, 2024',
-      trust: 'Seinfeld Family Dynasty Trust', trustDate:'2014-11-20', amendedDate:'2024-01-10',
+      state:'NY', spouse:'Jessica Seinfeld', trustee:'Jerry Seinfeld and Jessica Seinfeld',
+      estateValue: 19500000, lifeInsurance: 17500000, hasInsurance: true,
+      lastUpdated:'Jan 10, 2024',
+      trust: 'Seinfeld Family Revocable Trust', trustDate:'2014-11-20', amendedDate:'2024-01-10',
       successorTrustee:'Jessica Seinfeld', successorTrustee2:'Julian Seinfeld', coTrustee:'Jessica Seinfeld',
+      docs: { trust:true, pourOver:true, cert:true, poa:true, ahcd:true },
       assets: [
         { category:'Real Estate', icon:'🏡', items:[
           { desc:'Primary – NYC Upper West Side', institution:'n/a', titleName:'Seinfeld Family Trust', value:'$4,500,000', titling:'ok', contact:'Corcoran Group' },
@@ -3291,14 +3289,14 @@ const TRUST = {
           { desc:'Equity Portfolio', institution:'Goldman Sachs', titleName:'Seinfeld Family Trust', value:'$1M+', titling:'ok', contact:'Lisa Wong · (212) 555-0155' },
         ]},
         { category:'Life Insurance', icon:'🛡️', items:[
-          { desc:'Premium Finance PPLI – Mass Mutual', institution:'Mass Mutual', titleName:'Seinfeld ILIT', value:'$2,000,000', titling:'ok', contact:'LI101 · Anthony Mazzei' },
-          { desc:'Whole Life – Pacific Life', institution:'Pacific Life', titleName:'Seinfeld ILIT', value:'$500,000', titling:'ok', contact:'LI101 · Anthony Mazzei' },
+          { desc:'Whole Life – Guardian', institution:'Guardian', titleName:'Seinfeld ILIT', value:'$7,500,000', titling:'ok', beneficiary:'Seinfeld ILIT', contact:'LI101 · Rain Maker' },
+          { desc:'Term 20 – MassMutual', institution:'MassMutual', titleName:'Seinfeld ILIT', value:'$10,000,000', titling:'ok', beneficiary:'Seinfeld ILIT', contact:'LI101 · Rain Maker' },
         ]},
         { category:'Business Interests', icon:'🏢', items:[
           { desc:'Seinfeld Productions LLC', institution:'n/a', titleName:'Seinfeld Family Trust', value:'$1M+', titling:'ok', contact:'Legal: (310) 555-0200' },
         ]},
         { category:'Retirement Accounts', icon:'🏦', items:[
-          { desc:'Solo 401(k)', institution:'Fidelity', titleName:'Jerry Seinfeld', value:'$1M+', titling:'na', contact:'(800) 343-3548' },
+          { desc:'Solo 401(k)', institution:'Fidelity', titleName:'Jerry Seinfeld', value:'$1M+', titling:'na', beneficiary:'Jessica Seinfeld', contact:'(800) 343-3548' },
         ]},
         { category:'Vehicles', icon:'🚗', items:[
           { desc:'Classic Car Collection (14 vehicles)', institution:'n/a', titleName:'Seinfeld LLC', value:'$1M+', titling:'warn', contact:'Gooding & Company Appraisal' },
@@ -3307,10 +3305,12 @@ const TRUST = {
     },
     {
       id:'coach', name:'Coach Taylor', initials:'CT', color:'#059669',
-      estateValue: 3100000, lifeInsurance: 750000, hasInsurance: true,
-      titlingIssues: 1, lastUpdated:'May 10, 2018',
+      state:'TX', spouse:'Tami Taylor', trustee:'Eric Taylor and Tami Taylor',
+      estateValue: 3100000, lifeInsurance: 16000000, hasInsurance: true,
+      lastUpdated:'May 10, 2018',
       trust: 'Taylor Family Revocable Trust', trustDate:'2018-05-10', amendedDate:'2018-05-10',
       successorTrustee:'Tami Taylor', successorTrustee2:'Julie Taylor', coTrustee:'Tami Taylor',
+      docs: { trust:true, pourOver:true, cert:false, poa:true, ahcd:true },
       assets: [
         { category:'Real Estate', icon:'🏡', items:[
           { desc:'Primary – Austin, TX', institution:'n/a', titleName:'Taylor Family RLT', value:'$850,000', titling:'ok', contact:'Moreland Properties' },
@@ -3323,19 +3323,22 @@ const TRUST = {
           { desc:'Brokerage', institution:'Charles Schwab', titleName:'Taylor Family RLT', value:'$250K–$1M', titling:'ok', contact:'Dan Park · (512) 555-0188' },
         ]},
         { category:'Life Insurance', icon:'🛡️', items:[
-          { desc:'Whole Life – Pacific Life', institution:'Pacific Life', titleName:'Taylor ILIT', value:'$750,000', titling:'ok', contact:'LI101 · Rain Maker' },
+          { desc:'Whole Life – New York Life', institution:'New York Life', titleName:'Taylor ILIT', value:'$6,000,000', titling:'ok', beneficiary:'Taylor ILIT', contact:'LI101 · Rain Maker' },
+          { desc:'Universal Life – Pacific Life', institution:'Pacific Life', titleName:'Taylor ILIT', value:'$10,000,000', titling:'ok', beneficiary:'Taylor ILIT', contact:'LI101 · Rain Maker' },
         ]},
         { category:'Retirement Accounts', icon:'🏦', items:[
-          { desc:'State Pension – Texas Teachers', institution:'TRS of Texas', titleName:'Eric Taylor', value:'$1M+', titling:'na', contact:'(800) 223-8778' },
+          { desc:'State Pension – Texas Teachers', institution:'TRS of Texas', titleName:'Eric Taylor', value:'$1M+', titling:'na', beneficiary:'Tami Taylor', contact:'(800) 223-8778' },
         ]},
       ]
     },
     {
       id:'sydney', name:'Sydney Bristow', initials:'SB', color:'#0891b2',
+      state:'CA', spouse:null, trustee:'Sydney Bristow',
       estateValue: 2200000, lifeInsurance: 0, hasInsurance: false,
-      titlingIssues: 4, lastUpdated:'Jan 15, 2021',
+      lastUpdated:'Jan 15, 2021',
       trust: 'Bristow Revocable Living Trust', trustDate:'2021-01-15', amendedDate:'2021-01-15',
       successorTrustee:null, successorTrustee2:null, coTrustee:null,
+      docs: { trust:true, pourOver:true, cert:false, poa:false, ahcd:false },
       assets: [
         { category:'Real Estate', icon:'🏡', items:[
           { desc:'Condo – Santa Monica', institution:'n/a', titleName:'Sydney Bristow (personal)', value:'$1,400,000', titling:'warn', contact:'Compass' },
@@ -3348,7 +3351,7 @@ const TRUST = {
         ]},
         { category:'Life Insurance', icon:'🛡️', items:[] },
         { category:'Retirement Accounts', icon:'🏦', items:[
-          { desc:'Federal TSP', institution:'TSP', titleName:'Sydney Bristow', value:'$250K–$1M', titling:'na', contact:'(877) 968-3778' },
+          { desc:'Federal TSP', institution:'TSP', titleName:'Sydney Bristow', value:'$250K–$1M', titling:'na', beneficiary:null, contact:'(877) 968-3778' },
         ]},
         { category:'Vehicles', icon:'🚗', items:[
           { desc:'2022 BMW M3', institution:'n/a', titleName:'Sydney Bristow (personal)', value:'Under $100K', titling:'warn', contact:'DMV' },
@@ -3417,34 +3420,81 @@ function renderTrustSidebarPills() {
 
 // ═══════════ TRUST DASHBOARD ═══════════
 // ═══════════ TRUST READINESS SCORING ═══════════
-// Titling 60% · Required asset categories present 25% · Trust age 15%
-// Required: Real Estate, Bank Accounts, Life Insurance
-const REQUIRED_CATEGORIES = ['Real Estate', 'Bank Accounts', 'Life Insurance'];
+// Titling & beneficiary designations 60% · Core documents on file 15% · Required asset categories present 10% · Review recency 15%
+// Required categories: Real Estate, Bank Accounts (life insurance is NOT required — it is reported, not scored)
+const REQUIRED_CATEGORIES = ['Real Estate', 'Bank Accounts'];
+const CORE_DOCS = [
+  ['trust',    'Trust instrument'],
+  ['pourOver', 'Pour-over will'],
+  ['cert',     'Certification of trust'],
+  ['poa',      'Durable power of attorney'],
+  ['ahcd',     'Advance health care directive'],
+];
+const FED_EXEMPTION = 15000000; // 2026 federal basic exclusion amount, per person (OBBBA; indexed after 2026)
+const fmtShort =v => '$' + (v >= 1000000 ? (v/1000000).toFixed(1).replace(/\.0$/,'')+'M' : v >= 1000 ? Math.round(v/1000)+'K' : Math.round(v).toLocaleString());
+
+function localDate(str) {
+  // ISO "YYYY-MM-DD" parses as UTC midnight and shows a day early in US time zones; force local
+  return /^\d{4}-\d{2}-\d{2}$/.test(str) ? new Date(str + 'T00:00:00') : new Date(str);
+}
+function yearsSince(dateStr) {
+  return (TODAY - localDate(dateStr)) / (1000 * 60 * 60 * 24 * 365.25);
+}
+
+// Asset status: ok (titled in trust) · warn (needs retitling) · na (passes by beneficiary designation) · nobene (beneficiary-designated asset with no beneficiary on file)
+function itemStatus(i) {
+  if (i.titling === 'na') return i.beneficiary ? 'na' : 'nobene';
+  return i.titling;
+}
+function statusBadge(i) {
+  const st = itemStatus(i);
+  if (st === 'ok')     return '<span class="titling-badge titling-ok">✓ In Trust</span>';
+  if (st === 'warn')   return '<span class="titling-badge titling-warn">⚠ Needs Attention</span>';
+  if (st === 'nobene') return '<span class="titling-badge titling-warn">⚠ No Beneficiary on File</span>';
+  return `<span class="titling-badge titling-na">Bene: ${i.beneficiary}</span>`;
+}
+function clientIssues(c) {
+  return c.assets.flatMap(cat => cat.items.filter(i => { const st = itemStatus(i); return st === 'warn' || st === 'nobene'; }));
+}
+function docsOnFile(c) {
+  return CORE_DOCS.filter(([k]) => c.docs && c.docs[k]).length;
+}
+
+// Parse the questionnaire's value strings ("$4,200,000", "$250K–$1M", "$1M+", "Under $100K") into a usable midpoint
+function parseValue(v) {
+  if (typeof v === 'number') return v;
+  if (!v) return 0;
+  const str = String(v).replace(/,/g, '');
+  const nums = [...str.matchAll(/\$?(\d+(?:\.\d+)?)\s*([MKmk])?/g)].map(m => parseFloat(m[1]) * (/m/i.test(m[2]||'') ? 1e6 : /k/i.test(m[2]||'') ? 1e3 : 1));
+  if (!nums.length) return 0;
+  if (/under/i.test(str)) return nums[0] / 2;
+  if (/\+/.test(str)) return nums[0] * 1.5;
+  if (nums.length >= 2) return (nums[0] + nums[1]) / 2;
+  return nums[0];
+}
 
 function calcTrustReadiness(c) {
   const allItems = c.assets.flatMap(cat => cat.items);
   const totalItems = allItems.length;
 
-  // ── Titling score (60%) ──
-  // ok=full credit, na=full credit (beneficiary-designated, correct), warn=0
-  const titlingCredits = allItems.filter(i => i.titling === 'ok' || i.titling === 'na').length;
-  const titlingScore = totalItems > 0 ? (titlingCredits / totalItems) * 60 : 0;
+  // ── Titling + beneficiary designations (60%) ──
+  const good = allItems.filter(i => { const st = itemStatus(i); return st === 'ok' || st === 'na'; }).length;
+  const titlingScore = totalItems > 0 ? (good / totalItems) * 60 : 0;
 
-  // ── Required categories present (25%) ──
-  // Each required category present (has ≥1 item) = 1/3 of 25 points
+  // ── Core documents on file (15%) ──
+  const docScore = (docsOnFile(c) / CORE_DOCS.length) * 15;
+
+  // ── Required categories present (10%) ──
   const catPresent = REQUIRED_CATEGORIES.filter(req =>
     c.assets.some(cat => cat.category === req && cat.items.length > 0)
   ).length;
-  const assetScore = (catPresent / REQUIRED_CATEGORIES.length) * 25;
+  const catScore = (catPresent / REQUIRED_CATEGORIES.length) * 10;
 
-  // ── Trust age score (15%) ──
-  // Uses amendedDate — same as trustDate on day 1
-  const amended = new Date(c.amendedDate || c.trustDate);
-  const ageYears = (new Date('2026-03-05') - amended) / (1000 * 60 * 60 * 24 * 365);
-  // 0–2.5 yrs = full 15, 2.5–5 yrs = 10, 5+ yrs = 4
-  const ageScore = ageYears < 2.5 ? 15 : ageYears < 5 ? 10 : 4;
+  // ── Review recency (15%) — years since last amendment or review ──
+  const ageYears = yearsSince(c.amendedDate || c.trustDate);
+  const reviewScore = ageYears < 3 ? 15 : ageYears < 5 ? 8 : 3;
 
-  return Math.round(titlingScore + assetScore + ageScore);
+  return Math.round(titlingScore + docScore + catScore + reviewScore);
 }
 
 function readinessColor(r) {
@@ -3457,16 +3507,42 @@ function missingRequired(c) {
   );
 }
 
+// ── Estate tax model (illustrative: unmarried, federal only, no deductions, no state tax) ──
+function estateTax(c) {
+  const ins = c.lifeInsurance || 0;
+  const hasIlit = c.assets.some(cat => cat.items.some(it => /ilit/i.test(it.titleName || '')));
+  const shielded = hasIlit ? ins : 0;                 // death benefit held in an ILIT sits outside the estate
+  const total = (c.estateValue || 0) + ins;           // documented assets + death benefit
+  const taxable = total - shielded;
+  const above = Math.max(0, taxable - FED_EXEMPTION);
+  return { ins, hasIlit, shielded, total, taxable, above, fedTax: Math.round(above * 0.40), headroom: Math.max(0, FED_EXEMPTION - taxable) };
+}
+
+// ── Coverage assessment: liquidity-based, not a flat ratio ──
+function coverageAssessment(c) {
+  const t = estateTax(c);
+  if (!c.hasInsurance || !t.ins) return { flag:true, reason:'No life insurance documented. The estate may lack liquidity for taxes, administration costs, and equalizing distributions.' };
+  if (t.fedTax > 0 && t.ins < t.fedTax) return { flag:true, reason:`Estimated federal estate tax of ${fmtFull(t.fedTax)} exceeds the ${fmtFull(t.ins)} of insurance on file.` };
+  let illiquid = 0, tot = 0;
+  c.assets.forEach(cat => cat.items.forEach(i => {
+    if (cat.category === 'Life Insurance') return;
+    const v = parseValue(i.value); tot += v;
+    if (['Real Estate', 'Business Interests', 'Vehicles'].includes(cat.category)) illiquid += v;
+  }));
+  const share = tot > 0 ? illiquid / tot : 0;
+  if (share >= 0.7 && t.ins < 0.25 * (c.estateValue || 0)) return { flag:true, reason:`About ${Math.round(share*100)}% of documented assets are illiquid (real estate, business interests). Insurance on file is modest relative to that, so liquidity for the estate may be worth a conversation.` };
+  return { flag:false, reason:'Insurance on file appears proportionate to the documented estate and estimated tax.' };
+}
+
 function renderTrustDashboard() {
   const totalClients = TRUST.clients.length;
-  const titlingIssues = TRUST.clients.reduce((s, c) => s + c.titlingIssues, 0);
+  const titlingIssues = TRUST.clients.reduce((s, c) => s + clientIssues(c).length, 0);
   const scores = TRUST.clients.map(c => calcTrustReadiness(c));
   const avgReadiness = Math.round(scores.reduce((s, r) => s + r, 0) / totalClients);
-  const needsCoverage = TRUST.clients.filter(c => !c.hasInsurance || (c.lifeInsurance / c.estateValue) < 0.15).length;
+  const needsCoverage = TRUST.clients.filter(c => coverageAssessment(c).flag).length;
   const STALE_YEARS = 3;
   const staleClients = TRUST.clients.filter(c => {
-    const amended = new Date(c.amendedDate || c.trustDate);
-    return (new Date('2026-03-05') - amended) / (1000*60*60*24*365) >= STALE_YEARS;
+    return yearsSince(c.amendedDate || c.trustDate) >= STALE_YEARS;
   });
   const stale = staleClients.length;
   // Sort clients low score → high score for roster
@@ -3480,24 +3556,24 @@ function renderTrustDashboard() {
       <div class="card">
         <div class="card-hdr">Client Roster — Lowest Readiness First</div>
       <div class="trust-client-row-hdr">
-        <span style="padding-left:0">Client / Trust</span><span style="padding-left:38px">Last Updated</span><span style="text-align:center">Titling</span><span style="text-align:center">Score</span><span></span>
+        <span>Client / Trust</span><span>Last Updated</span><span style="text-align:center">Issues</span><span style="text-align:center">Score</span><span></span>
       </div>
         <div>
           ${sortedClients.map(c => {
             const r = calcTrustReadiness(c);
             const readColor = readinessColor(r);
-            const missing = missingRequired(c);
+            const nIssues = clientIssues(c).length;
             return `
             <div class="trust-client-row" onclick="selectTrustClient('${c.id}')">
-              <div style="display:flex;align-items:flex-start;gap:10px;min-width:0">
-                <div class="ca" style="background:${c.color};width:32px;height:32px;font-size:11px;flex-shrink:0;margin-top:18px">${c.initials}</div>
-                <div style="min-width:0;display:flex;flex-direction:column;justify-content:space-between;align-self:stretch;padding:22px 0 10px">
+              <div style="display:flex;align-items:center;gap:10px;min-width:0">
+                <div class="ca" style="background:${c.color};width:32px;height:32px;font-size:11px;flex-shrink:0">${c.initials}</div>
+                <div style="min-width:0">
                   <div style="font-weight:700;color:var(--navy);font-size:13px">${c.name}</div>
-                  <div style="font-size:11px;color:var(--gray-400);white-space:nowrap;overflow:visible;margin-top:32px;margin-left:-26px">${c.trust}</div>
+                  <div style="font-size:11px;color:var(--gray-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.trust}</div>
                 </div>
               </div>
-              <div style="font-size:12px;color:var(--gray-600);display:flex;align-items:center;justify-content:center;padding-left:30px">${c.lastUpdated || '—'}</div>
-              <div style="font-size:12px;display:flex;align-items:center;justify-content:center">${c.titlingIssues > 0 ? `<span style="color:#f59e0b;font-weight:600">${c.titlingIssues} issue${c.titlingIssues>1?'s':''}</span>` : '<span style="color:#22c55e">✓ Clean</span>'}</div>
+              <div style="font-size:12px;color:var(--gray-600)">${c.lastUpdated || '—'}</div>
+              <div style="font-size:12px;text-align:center">${nIssues > 0 ? `<span style="color:#f59e0b;font-weight:600">${nIssues} issue${nIssues>1?'s':''}</span>` : '<span style="color:#22c55e">✓ Clean</span>'}</div>
               <div style="display:flex;justify-content:center;align-items:center">
                 <div style="width:40px;height:40px;border-radius:50%;border:3px solid ${readColor};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${readColor}">${r}%</div>
               </div>
@@ -3515,7 +3591,7 @@ function renderTrustDashboard() {
           ${[
             { label:'Active Clients',  val: totalClients,     sub:'Trust matters',       color:'var(--teal-mid)' },
             { label:'Avg Readiness',   val: avgReadiness+'%', sub:'Across all clients',  color:'var(--teal-mid)' },
-            { label:'Titling Issues',  val: titlingIssues,    sub:'Assets to address',   color: titlingIssues > 0 ? '#f59e0b' : '#22c55e' },
+            { label:'Funding Issues',  val: titlingIssues,    sub:'Titling & beneficiary gaps', color: titlingIssues > 0 ? '#f59e0b' : '#22c55e' },
             { label:'Not Amended 3+ Yrs', val: stale,         sub:'Trusts due for review', color: stale > 0 ? '#f59e0b' : '#22c55e' },
           ].map(s => `
           <div class="trust-stat" style="padding:14px 16px">
@@ -3536,8 +3612,7 @@ function renderTrustDashboard() {
             <span style="font-size:10px;color:var(--gray-400)">${staleClients.length} client${staleClients.length!==1?'s':''}</span>
           </div>
           ${[...staleClients].sort((a,b) => new Date(a.amendedDate||a.trustDate) - new Date(b.amendedDate||b.trustDate)).map(c => {
-            const amended = new Date(c.amendedDate || c.trustDate);
-            const ageYears = Math.round((new Date('2026-03-05') - amended) / (1000*60*60*24*365));
+            const ageYears = Math.round(yearsSince(c.amendedDate || c.trustDate));
             const neverAmended = !c.amendedDate || c.amendedDate === c.trustDate;
             return `
             <div style="padding:10px 16px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;gap:10px">
@@ -3563,13 +3638,13 @@ function renderTrustDashboard() {
       <div class="card-hdr" style="background:rgba(13,148,136,.06);justify-content:space-between">
         <span style="display:flex;align-items:center;gap:8px">
           <span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;display:inline-block"></span>
-          <span style="color:var(--teal);font-weight:700;letter-spacing:.1px">Titling Issues — Assets Not Yet In Trust</span>
+          <span style="color:var(--teal);font-weight:700;letter-spacing:.1px">Funding Issues — Assets Not Yet In Trust or Missing a Beneficiary</span>
         </span>
-        <span style="font-size:11px;color:var(--gray-400)">${titlingIssues} asset${titlingIssues!==1?'s':''} across ${TRUST.clients.filter(c=>c.titlingIssues>0).length} clients</span>
+        <span style="font-size:11px;color:var(--gray-400)">${titlingIssues} asset${titlingIssues!==1?'s':''} across ${TRUST.clients.filter(c=>clientIssues(c).length>0).length} clients</span>
       </div>
       <div style="padding:0 4px">
-        ${TRUST.clients.filter(c => c.titlingIssues > 0).sort((a,b) => b.titlingIssues - a.titlingIssues).map(c => {
-          const warnAssets = c.assets.flatMap(cat => cat.items.filter(i => i.titling === 'warn'));
+        ${TRUST.clients.filter(c => clientIssues(c).length > 0).sort((a,b) => clientIssues(b).length - clientIssues(a).length).map(c => {
+          const warnAssets = clientIssues(c);
           return `
           <div style="padding:14px 18px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;gap:16px">
             <div style="display:flex;align-items:center;gap:10px;flex:1">
@@ -3577,7 +3652,7 @@ function renderTrustDashboard() {
               <div>
                 <div style="font-weight:600;font-size:13px">${c.name}</div>
                 <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px">
-                  ${warnAssets.map(a => `<span style="padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(13,148,136,.08);color:var(--teal);border:1px solid rgba(13,148,136,.2)">⚠ ${a.desc}</span>`).join('')}
+                  ${warnAssets.map(a => `<span style="padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(13,148,136,.08);color:var(--teal);border:1px solid rgba(13,148,136,.2)">⚠ ${a.desc}${itemStatus(a)==='nobene'?' · no beneficiary':''}</span>`).join('')}
                 </div>
               </div>
             </div>
@@ -3592,7 +3667,7 @@ function renderTrustDashboard() {
     <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 18px;border-radius:8px;border:1px solid rgba(13,148,136,.22);background:rgba(13,148,136,.03);gap:12px">
       <div style="display:flex;align-items:center;gap:10px">
         <span style="font-size:15px">🛡</span>
-        <span style="font-size:12px;color:var(--gray-600)"><strong style="color:var(--navy)">${needsCoverage}</strong> client${needsCoverage!==1?'s':''} may have a life insurance gap</span>
+        <span style="font-size:12px;color:var(--gray-600)"><strong style="color:var(--navy)">${needsCoverage}</strong> client${needsCoverage!==1?'s':''} may warrant a liquidity / coverage conversation</span>
       </div>
       <a onclick="trustNav('coverage-summary')" style="font-size:11px;font-weight:600;color:var(--teal);cursor:pointer;white-space:nowrap;text-decoration:none">View summary →</a>
     </div>
@@ -3614,7 +3689,7 @@ function renderTrustClients() {
   el.innerHTML = `
     <div class="card">
       <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 56px 80px;gap:12px;padding:8px 18px;background:var(--gray-100);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400)">
-        <span>Client / Trust</span><span>Last Updated</span><span>Titling</span><span>Trust Age</span><span style="text-align:center">Readiness</span><span></span>
+        <span>Client / Trust</span><span>Last Updated</span><span>Issues</span><span>Since Review</span><span style="text-align:center">Readiness</span><span></span>
       </div>
       ${[...TRUST.clients].sort((a,b) => {
         const lastA = a.name.split(' ').slice(-1)[0];
@@ -3623,8 +3698,8 @@ function renderTrustClients() {
       }).map(c => {
         const r = calcTrustReadiness(c);
         const readColor = readinessColor(r);
-        const amended = new Date(c.amendedDate || c.trustDate);
-        const ageYears = Math.round((new Date('2026-03-05') - amended) / (1000*60*60*24*365));
+        const ageYears = Math.round(yearsSince(c.amendedDate || c.trustDate));
+        const nIssues = clientIssues(c).length;
         const trustAgeColor = ageYears >= 5 ? '#f59e0b' : '#22c55e';
         const trustAgeLabel = ageYears >= 5 ? `⚠ ${ageYears} yrs` : `✓ ${ageYears} yr${ageYears!==1?'s':''}`;
         const missing = missingRequired(c);
@@ -3639,7 +3714,7 @@ function renderTrustClients() {
             </div>
           </div>
           <div style="font-size:12px;color:var(--gray-600);display:flex;align-items:center">${c.lastUpdated || '—'}</div>
-          <div>${c.titlingIssues > 0 ? `<span style="color:#f59e0b;font-weight:600">${c.titlingIssues} issue${c.titlingIssues>1?'s':''}</span>` : '<span style="color:#22c55e;font-weight:600">✓ Clean</span>'}</div>
+          <div>${nIssues > 0 ? `<span style="color:#f59e0b;font-weight:600">${nIssues} issue${nIssues>1?'s':''}</span>` : '<span style="color:#22c55e;font-weight:600">✓ Clean</span>'}</div>
           <div style="font-weight:600;color:${trustAgeColor}">${trustAgeLabel}</div>
           <div style="display:flex;justify-content:center">
             <div style="width:44px;height:44px;border-radius:50%;border:3px solid ${readColor};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${readColor}">${r}%</div>
@@ -3656,31 +3731,33 @@ function renderTrustClientDetail(id) {
   const c = TRUST.clients.find(x => x.id === id);
   if (!c) return;
   document.getElementById('tcd-title').textContent = c.name + ' — Estate Detail';
-  document.getElementById('tcd-sub').innerHTML = `<span style="color:#e8715a;font-weight:700">${c.trust}</span> <span style="color:var(--gray-400);font-weight:400">· Executed ${new Date(c.trustDate).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</span>`;
+  document.getElementById('tcd-sub').innerHTML = `<span style="color:#e8715a;font-weight:700">${c.trust}</span> <span style="color:var(--gray-400);font-weight:400">· Executed ${localDate(c.trustDate).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</span>`;
 
   const totalAssets = c.assets.reduce((s, cat) => s + cat.items.length, 0);
-  const titlingOk = c.assets.reduce((s, cat) => s + cat.items.filter(i => i.titling === 'ok').length, 0);
-  const titlingWarn = c.assets.reduce((s, cat) => s + cat.items.filter(i => i.titling === 'warn').length, 0);
-  const titlingNa = c.assets.reduce((s, cat) => s + cat.items.filter(i => i.titling === 'na').length, 0);
+  const titlingOk = c.assets.reduce((s, cat) => s + cat.items.filter(i => itemStatus(i) === 'ok').length, 0);
+  const titlingNa = c.assets.reduce((s, cat) => s + cat.items.filter(i => itemStatus(i) === 'na').length, 0);
+  const issues = clientIssues(c);
+  const titlingWarn = issues.length;
   const readiness = calcTrustReadiness(c);
   const readColor = readinessColor(readiness);
   const missing = missingRequired(c);
-  const amended = new Date(c.amendedDate || c.trustDate);
-  const amendedAge = Math.round((new Date('2026-03-05') - amended) / (1000*60*60*24*365));
+  const amendedAge = Math.round(yearsSince(c.amendedDate || c.trustDate));
   const neverAmended = !c.amendedDate || c.amendedDate === c.trustDate;
 
   // Coverage note (quiet, attorney-only)
-  const ratio = c.lifeInsurance / c.estateValue;
-  const pct = Math.round(ratio * 100);
-  const hasCoverageNote = !c.hasInsurance || pct < 15;
+  const cov = coverageAssessment(c);
+  const hasCoverageNote = cov.flag;
 
   const el = document.getElementById('trust-client-detail-content');
   el.innerHTML = `
-    <div style="display:block">
-      <div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start">
+      <div style="min-width:0">
         <!-- ASSET SCHEDULE -->
         <div style="margin-bottom:12px">
-          <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:12px">Schedule C — Asset List</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div style="font-size:14px;font-weight:600;color:var(--navy)">Schedule of Assets</div>
+            <button class="btn btn-outline" style="font-size:11px;padding:4px 12px;border-color:var(--teal);color:var(--teal)" onclick="openFundingLetters('${c.id}')">📄 Draft funding letters${issues.length?' ('+issues.length+')':''}</button>
+          </div>
           ${(()=>{
             const CANON = [
               ['Real Estate',         '🏡'],
@@ -3705,18 +3782,18 @@ function renderTrustClientDetail(id) {
               <div class="asset-cat">
                 <div class="asset-cat-hdr">
                   <div class="asset-cat-title">${icon} ${catName}</div>
-                  <div class="asset-cat-meta">${items.length} asset${items.length > 1 ? 's' : ''} · ${items.filter(i=>i.titling==='ok').length} in trust</div>
+                  <div class="asset-cat-meta">${items.length} asset${items.length > 1 ? 's' : ''} · ${items.filter(i=>itemStatus(i)==='ok').length} in trust${items.some(i=>i.titling==='na')?' · '+items.filter(i=>itemStatus(i)==='na').length+' by beneficiary':''}</div>
                 </div>
                 <div class="asset-row-hdr">
-                  <span>Description</span><span>Institution / Contact</span><span>Title / Owner</span><span>Est. Value</span><span>Titling Status</span>
+                  <span>Description</span><span>Institution / Contact</span><span>Title / Owner</span><span>Est. Value</span><span>Status</span>
                 </div>
                 ${items.map(item => `
                 <div class="asset-row">
                   <div style="font-weight:500;color:var(--navy)">${item.desc}</div>
-                  <div style="color:var(--gray-600);font-size:12px">${item.contact}</div>
+                  <div style="color:var(--gray-600);font-size:12px">${item.institution && item.institution!=='n/a' ? item.institution+'<br>' : ''}${item.contact}</div>
                   <div style="font-size:12px;color:var(--gray-600)">${item.titleName}</div>
                   <div style="font-weight:500">${item.value}</div>
-                  <div><span class="titling-badge ${item.titling === 'ok' ? 'titling-ok' : item.titling === 'warn' ? 'titling-warn' : 'titling-na'}">${item.titling === 'ok' ? '✓ In Trust' : item.titling === 'warn' ? '⚠ Needs Attention' : '— N/A'}</span></div>
+                  <div>${statusBadge(item)}</div>
                 </div>`).join('')}
               </div>`;
             }).join('');
@@ -3731,26 +3808,19 @@ function renderTrustClientDetail(id) {
         ${hasCoverageNote ? `
         <div style="border:1.5px solid var(--teal);border-radius:10px;padding:16px 20px;background:rgba(13,148,136,.03)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--teal)">Coverage Note — Attorney Reference Only</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--teal)">Liquidity & Coverage Note — Attorney Reference Only</div>
             <span style="font-size:10px;color:var(--gray-400)">🔒 Not visible to agents</span>
           </div>
-          <div style="font-size:13px;color:var(--gray-600);line-height:1.6">
-            ${!c.hasInsurance
-              ? 'No life insurance policies are on file for this client.'
-              : pct < 15
-              ? `Life insurance on file represents approximately ${pct}% of documented estate assets.`
-              : `Life insurance on file represents approximately ${pct}% of documented estate assets.`
-            }
-          </div>
+          <div style="font-size:13px;color:var(--gray-600);line-height:1.6">${cov.reason}</div>
         </div>` : `
         <div style="border:1.5px solid var(--teal);border-radius:10px;padding:14px 18px;background:rgba(13,148,136,.02)">
           <div style="font-size:12px;color:#15803d;font-weight:600">✓ Coverage Note</div>
-          <div style="font-size:12px;color:var(--gray-600);margin-top:4px">Life insurance policies on file appear proportionate to documented estate assets.</div>
+          <div style="font-size:12px;color:var(--gray-600);margin-top:4px">${cov.reason}</div>
         </div>`}
       </div>
 
       <!-- RIGHT PANEL -->
-      <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:76px">
+      <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:76px;min-width:0">
         <!-- Readiness -->
         <div class="card">
           <div class="card-hdr">Estate Readiness</div>
@@ -3759,7 +3829,8 @@ function renderTrustClientDetail(id) {
               <span style="font-family:var(--font-d);font-size:26px;color:var(--navy)">${readiness}%</span>
             </div>
             <div style="display:flex;flex-direction:column;gap:5px;text-align:left;margin-bottom:10px">
-              <div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--gray-100)"><span style="color:var(--gray-500)">Titling score</span><span style="font-weight:600;color:var(--gray-600)">${totalAssets>0?Math.round((titlingOk+titlingNa)/totalAssets*100):0}%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--gray-100)"><span style="color:var(--gray-500)">Titled / designated</span><span style="font-weight:600;color:var(--gray-600)">${totalAssets>0?Math.round((titlingOk+titlingNa)/totalAssets*100):0}%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--gray-100)"><span style="color:var(--gray-500)">Core documents</span><span style="font-weight:600;color:${docsOnFile(c)<CORE_DOCS.length?'#f59e0b':'var(--gray-600)'}">${docsOnFile(c)} of ${CORE_DOCS.length} on file</span></div>
               <div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--gray-100)"><span style="color:var(--gray-500)">Asset categories</span><span style="font-weight:600;color:var(--gray-600)">${c.assets.filter(cat=>cat.items&&cat.items.length>0).length} of 7 documented</span></div>
               <div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0"><span style="color:var(--gray-500)">Last amended</span><span style="font-weight:600;color:${amendedAge>=3?'#f59e0b':'var(--gray-600)'}">${amendedAge < 1 ? 'This year' : Math.floor(amendedAge)+' yr'+(Math.floor(amendedAge)>1?'s':'')+' ago'}</span></div>
             </div>
@@ -3767,7 +3838,7 @@ function renderTrustClientDetail(id) {
             <div style="display:flex;flex-direction:column;gap:4px;text-align:left;margin-top:10px">
               <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-top:1px solid var(--gray-100)"><span>Total assets</span><span style="font-weight:600">${totalAssets}</span></div>
               <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span style="color:#22c55e">✓ In trust / designated</span><span style="font-weight:600;color:#22c55e">${titlingOk+titlingNa}</span></div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span style="color:#f59e0b">⚠ Needs Attention</span><span style="font-weight:600;color:#f59e0b">${titlingWarn}</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span style="color:#f59e0b">⚠ Needs attention / no beneficiary</span><span style="font-weight:600;color:#f59e0b">${titlingWarn}</span></div>
             </div>
           </div>
         </div>
@@ -3777,16 +3848,13 @@ function renderTrustClientDetail(id) {
           <div class="card-hdr">Estate Tax Exposure</div>
           <div class="card-body" style="padding:14px 16px">
             ${(()=>{
-              const FED_EXEMPTION = 13610000;
-              const total = c.estateValue || 0;
-              const hasIlit = c.assets && c.assets.some(cat => cat.items && cat.items.some(it => it.titleName && it.titleName.toLowerCase().includes('ilit')));
-              const shielded = hasIlit ? (c.lifeInsurance || 0) : 0;
-              const taxable = total - shielded;
+              const et = estateTax(c);
+              const total = et.total, hasIlit = et.hasIlit, shielded = et.shielded, taxable = et.taxable;
               const shieldedPct = total > 0 ? Math.round(shielded / total * 100) : 0;
               const taxablePct = 100 - shieldedPct;
-              const aboveExemption = Math.max(0, taxable - FED_EXEMPTION);
-              const fedTax = Math.round(aboveExemption * 0.40);
-              const headroom = Math.max(0, FED_EXEMPTION - taxable);
+              const aboveExemption = et.above;
+              const fedTax = et.fedTax;
+              const headroom = et.headroom;
               const headroomPct = Math.min(100, Math.round(taxable / FED_EXEMPTION * 100));
               const belowThreshold = taxable < FED_EXEMPTION;
               const fmt = v => '$' + (v >= 1000000 ? (v/1000000).toFixed(1).replace(/\.0$/,'')+'M' : v >= 1000 ? Math.round(v/1000)+'K' : v.toLocaleString());
@@ -3812,17 +3880,17 @@ function renderTrustClientDetail(id) {
                 +'</svg>';
               const legendHtml='<div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">'
                 +'<div style="display:flex;align-items:center;gap:5px;font-size:10px"><span style="width:9px;height:9px;border-radius:2px;background:#0f2744;display:inline-block;flex-shrink:0"></span><span style="color:#475569">Taxable Estate</span></div>'
-                +(shieldedPct>0?'<div style="display:flex;align-items:center;gap:5px;font-size:10px"><span style="width:9px;height:9px;border-radius:2px;background:#0d9488;display:inline-block;flex-shrink:0"></span><span style="color:#475569">Shielded (ILIT)</span></div>':'')
+                +(shieldedPct>0?'<div style="display:flex;align-items:center;gap:5px;font-size:10px"><span style="width:9px;height:9px;border-radius:2px;background:#0d9488;display:inline-block;flex-shrink:0"></span><span style="color:#475569">Outside estate (ILIT)</span></div>':'')
                 +(aboveExemption>0?'<div style="display:flex;align-items:center;gap:5px;font-size:10px"><span style="width:9px;height:9px;border-radius:2px;background:#e8715a;display:inline-block;flex-shrink:0"></span><span style="color:#475569">Above Threshold</span></div>':'')
                 +'</div>';
               const leftCol='<div style="display:flex;flex-direction:column;align-items:center">'+svgHtml+legendHtml+'</div>';
               const bar=(pct,col)=>'<div style="height:4px;border-radius:3px;background:#e8edf2;overflow:hidden"><div style="height:100%;width:'+Math.min(pct,100)+'%;background:'+col+';border-radius:3px"></div></div>';
               const p1='<div style="border-bottom:1px solid #e8edf2;padding-bottom:10px;margin-bottom:10px">'
-                +'<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;margin-bottom:2px">Estimated Total Estate</div>'
+                +'<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;margin-bottom:2px">Gross Estate — assets + death benefit</div>'
                 +'<div style="font-size:18px;font-weight:700;color:#0f2744;margin-bottom:5px">'+fmtFull(total)+'</div>'
                 +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:5px">'
                   +'<div><div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="width:6px;height:6px;border-radius:50%;background:#0f2744;display:inline-block"></span>Taxable Estate</div><div style="font-weight:600;font-size:12px">'+fmtFull(taxable)+'</div></div>'
-                  +'<div><div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="width:6px;height:6px;border-radius:50%;background:#0d9488;display:inline-block"></span>Shielded (ILIT)</div><div style="font-weight:600;font-size:12px;color:'+(shielded>0?'#0d9488':'#94a3b8')+'">'+fmtFull(shielded)+'</div></div>'
+                  +'<div><div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="width:6px;height:6px;border-radius:50%;background:#0d9488;display:inline-block"></span>Outside estate (ILIT)</div><div style="font-weight:600;font-size:12px;color:'+(shielded>0?'#0d9488':'#94a3b8')+'">'+fmtFull(shielded)+'</div></div>'
                 +'</div>'
                 +bar(taxablePct,'#0f2744')
                 +'<div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-top:2px"><span>'+taxablePct+'%</span><span>'+shieldedPct+'%</span></div>'
@@ -3840,7 +3908,7 @@ function renderTrustClientDetail(id) {
                 +bar(fedTax>0?100:headroomPct, fedTax>0?'#e8715a':'#16a34a')
               +'</div>';
               const p3='<div style="border-bottom:1px solid #e8edf2;padding-bottom:10px;margin-bottom:10px">'
-                +'<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;margin-bottom:2px">Federal Exemption Used — '+fmtFull(FED_EXEMPTION)+'</div>'
+                +'<div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:#94a3b8;margin-bottom:2px">2026 Federal Exclusion Used — '+fmtFull(FED_EXEMPTION)+' per person</div>'
                 +'<div style="font-size:18px;font-weight:700;color:'+(belowThreshold?'#0369a1':'#e8715a')+';margin-bottom:5px">'+fmtFull(Math.min(taxable,FED_EXEMPTION))+'</div>'
                 +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:5px">'
                   +'<div><div style="font-size:9px;color:#64748b;display:flex;align-items:center;gap:3px;margin-bottom:1px"><span style="width:6px;height:6px;border-radius:50%;background:#0369a1;display:inline-block"></span>Exemption Used</div><div style="font-weight:600;font-size:12px">'+fmtFull(Math.min(taxable,FED_EXEMPTION))+'</div></div>'
@@ -3851,8 +3919,10 @@ function renderTrustClientDetail(id) {
               +'</div>';
               const p4=!hasIlit
                 ?'<div style="padding:8px 10px;border-radius:6px;background:rgba(13,148,136,.06);border:1px solid rgba(13,148,136,.25)">'
-                  +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#0d9488;margin-bottom:4px">💡 Planning Opportunity</div>'
-                  +'<div style="font-size:10px;color:#334155;line-height:1.5">No ILIT in place. Life insurance proceeds currently sit inside the taxable estate. An ILIT could move these outside the estate, reducing taxable exposure'+(fedTax>0?' and the '+fmtFull(fedTax)+' tax bill':' and protecting against future law changes')+'.</div>'
+                  +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#0d9488;margin-bottom:4px">💡 Planning Note</div>'
+                  +'<div style="font-size:10px;color:#334155;line-height:1.5">'+(et.ins>0
+                      ? 'No ILIT in place. The '+fmtFull(et.ins)+' death benefit is included in the gross estate. An ILIT would keep it outside the estate'+(fedTax>0?' and reduce the '+fmtFull(fedTax)+' estimated tax':' and protect against future changes in the exclusion')+'.'
+                      : 'No life insurance documented. If coverage is added for liquidity, an ILIT would keep the death benefit outside the taxable estate.')+'</div>'
                 +'</div>'
                 :aboveExemption>0
                   ?'<div style="padding:8px 10px;border-radius:6px;background:rgba(232,113,90,.06);border:1px solid rgba(232,113,90,.3)">'
@@ -3860,7 +3930,11 @@ function renderTrustClientDetail(id) {
                     +'<div style="font-size:10px;color:#334155;line-height:1.5">'+fmtFull(aboveExemption)+' exceeds the federal exemption, generating an estimated '+fmtFull(fedTax)+' estate tax. Consider expanding ILIT coverage or gifting strategies to reduce exposure.</div>'
                   +'</div>'
                   :'';
-              const rightCol='<div style="display:flex;flex-direction:column">'+p1+p2+p3+p4+'</div>';
+              const p5='<div style="margin-top:10px;font-size:9px;color:#94a3b8;line-height:1.5">Illustrative only. Assumes an unmarried decedent, no marital or charitable deduction, and no state estate tax.'
+                +(c.spouse?' Client is married: the unlimited marital deduction and portability (up to '+fmtShort(FED_EXEMPTION*2)+' combined) are not modeled.':'')
+                +(c.state==='NY'?' New York imposes its own estate tax with a cliff above the state exclusion; not modeled.':'')
+                +'</div>';
+              const rightCol='<div style="display:flex;flex-direction:column">'+p1+p2+p3+p4+p5+'</div>';
               return '<div style="display:grid;grid-template-columns:160px 1fr;gap:18px;align-items:start">'+leftCol+rightCol+'</div>';
             })()}
           </div>
@@ -3879,34 +3953,39 @@ function renderTrustClientDetail(id) {
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
               <div style="padding:7px 10px;border-radius:6px;background:var(--offwhite);border:1px solid var(--gray-200)">
                 <div style="color:var(--gray-400);font-size:9px;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Executed</div>
-                <div style="font-weight:500">${new Date(c.trustDate).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}</div>
+                <div style="font-weight:500">${localDate(c.trustDate).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}</div>
               </div>
               <div style="padding:7px 10px;border-radius:6px;background:var(--offwhite);border:1px solid var(--gray-200)">
                 <div style="color:var(--gray-400);font-size:9px;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Last Amended</div>
                 <div style="font-weight:500;display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-                  ${neverAmended ? `<span style="color:var(--gray-400);font-style:italic">Never amended</span>` : new Date(c.amendedDate).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}
+                  ${neverAmended ? `<span style="color:var(--gray-400);font-style:italic">Never amended</span>` : localDate(c.amendedDate).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}
                   ${amendedAge >= 3 ? `<span style="font-size:9px;font-weight:700;color:#f59e0b">⚠ ${amendedAge} yrs</span>` : ''}
                 </div>
               </div>
             </div>
             <!-- Next review date -->
             ${(()=>{
-              const nextReview = new Date(c.amendedDate || c.trustDate);
+              const nextReview = localDate(c.amendedDate || c.trustDate);
               nextReview.setFullYear(nextReview.getFullYear() + 4);
-              const overdue = nextReview < new Date('2026-03-05');
+              const overdue = nextReview < TODAY;
               const nextStr = nextReview.toLocaleDateString('en-US',{year:'numeric',month:'short'});
               return `<div style="padding:7px 10px;border-radius:6px;background:rgba(13,148,136,.04);border:1px solid rgba(13,148,136,.2)">
                 <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);margin-bottom:3px">Next Recommended Review</div>
                 <div style="font-weight:600;color:${overdue?'#f59e0b':'var(--teal)'};font-size:12px">${overdue?'⚠ Overdue — was '+nextStr:'✓ ' + nextStr}</div>
               </div>`;
             })()}
+            <!-- Core documents checklist -->
+            <div style="padding:9px 12px;border-radius:6px;border:1px solid var(--gray-200);background:var(--offwhite)">
+              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);margin-bottom:4px">Core Documents · ${docsOnFile(c)} of ${CORE_DOCS.length} on file</div>
+              ${CORE_DOCS.map(([k,l]) => `<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid var(--gray-100)"><span style="color:var(--gray-600)">${l}</span><span style="font-weight:600;color:${c.docs&&c.docs[k]?'#15803d':'#f59e0b'}">${c.docs&&c.docs[k]?'✓ On file':'⚠ Missing'}</span></div>`).join('')}
+            </div>
             <!-- PDF download link -->
             <div style="padding:7px 10px;border-radius:6px;background:var(--offwhite);border:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between">
               <div>
                 <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--gray-400);margin-bottom:2px">Trust Document</div>
-                <div style="font-size:11px;color:var(--gray-600)">${c.trust} · ${neverAmended?new Date(c.trustDate).toLocaleDateString('en-US',{year:'numeric',month:'short'}):new Date(c.amendedDate).toLocaleDateString('en-US',{year:'numeric',month:'short'})}</div>
+                <div style="font-size:11px;color:var(--gray-600)">${c.trust} · ${neverAmended?localDate(c.trustDate).toLocaleDateString('en-US',{year:'numeric',month:'short'}):localDate(c.amendedDate).toLocaleDateString('en-US',{year:'numeric',month:'short'})}</div>
               </div>
-              <button class="btn btn-outline" style="font-size:10px;padding:4px 10px;border-color:var(--teal);color:var(--teal)" onclick="showToast('PDF download coming in full build — document stored in your office DMS')">📄 Download</button>
+              <button class="btn btn-outline" style="font-size:10px;padding:4px 10px;white-space:nowrap;flex-shrink:0;margin-left:10px;border-color:var(--teal);color:var(--teal)" onclick="showToast('PDF download coming in full build — document stored in your office DMS')">📄 Download</button>
             </div>
             <!-- Successor + Co-trustee in grey box -->
             <div style="padding:9px 12px;border-radius:6px;border:1px solid var(--gray-200);background:var(--offwhite)">
@@ -3951,6 +4030,64 @@ function renderTrustClientDetail(id) {
 
 
 
+// ═══════════ FUNDING LETTERS ═══════════
+function fundingLetter(c, cat, item) {
+  const first = c.name.split(' ')[0];
+  const trustLine = `${c.trust}, ${c.trustee || c.name}, Trustee`;
+  const today = TODAY.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  const hdr = `${TRUST.attorney.firm}\n${TRUST.attorney.location}\n${today}\n\n`;
+  const sig = `\n\nSincerely,\n${TRUST.attorney.name}\n${TRUST.attorney.firm}`;
+  const st = itemStatus(item);
+  if (st === 'nobene') return { title:`Beneficiary designation — ${item.desc}`, to:c.name,
+    body: hdr + `Dear ${first},\n\nOur records show no beneficiary designation on file for your ${item.desc} at ${item.institution}. Retirement accounts pass by beneficiary designation rather than through your trust, so as it stands this account would go through probate.\n\nPlease request a beneficiary designation form from ${item.institution} (${item.contact}). Before naming the trust as beneficiary, let's talk: a trust beneficiary can shorten the income-tax payout period under the SECURE Act's 10-year rule, and naming a spouse or individuals directly is often the better result.` + sig };
+  switch (cat) {
+    case 'Real Estate': return { title:`Deed — ${item.desc}`, to:c.name,
+      body: hdr + `Dear ${first},\n\nTitle to ${item.desc} is currently held as "${item.titleName}." For this property to pass under your trust and avoid probate, it needs to be deeded to:\n\n    ${trustLine}\n\nEnclosed is a trust transfer deed for your signature before a notary. Once signed, we will record it with the county recorder${c.state === 'CA' ? ' and file the Preliminary Change of Ownership Report; a transfer into your own revocable trust is excluded from property-tax reassessment' : ''}. If the property carries a mortgage, a transfer to your revocable trust is permitted under the Garn-St Germain Act for residential property, but please ask your insurer to add the trust to the policy.` + sig };
+    case 'Bank Accounts':
+    case 'Investment Accounts': return { title:`Retitling request — ${item.desc}`, to:item.institution,
+      body: hdr + `${item.institution}\nAttn: Account Services (${item.contact})\n\nRe: ${item.desc} held in the name of ${item.titleName}\n\nPlease retitle the above account to:\n\n    ${trustLine}\n\nA Certification of Trust${c.state === 'CA' ? ' under California Probate Code §18100.5' : ''} is enclosed, together with the account holder's signed authorization. The trust is revocable and reports under the account holder's Social Security number; no new tax identification number is required. Please confirm in writing once the change is complete.` + sig + `\non behalf of ${c.name}` };
+    case 'Business Interests': return { title:`Assignment of interest — ${item.desc}`, to:c.name,
+      body: hdr + `Dear ${first},\n\nYour interest in ${item.desc} is held in your individual name. Enclosed is an Assignment of Membership Interest transferring that interest to:\n\n    ${trustLine}\n\nBefore signing, please check the operating agreement for transfer restrictions or consent requirements, and let us know of any buy-sell agreement. We will update the company's records once the assignment is executed.` + sig };
+    case 'Vehicles': return { title:`Vehicle — ${item.desc}`, to:'File note',
+      body: hdr + `File note — ${item.desc}\n\nVehicles are usually left outside the trust. ${c.state === 'CA' ? 'California allows a vehicle to pass at death without probate by DMV affidavit (Vehicle Code §5910), and the small-estate procedure covers modest values. ' : ''}Retitling at the DMV is only worth doing for high-value or collectible vehicles. Recommendation: leave as is and carry the vehicle on the schedule of assets for information only.\n\n${TRUST.attorney.name}` };
+    default: return { title:`Retitling — ${item.desc}`, to:c.name,
+      body: hdr + `Dear ${first},\n\n${item.desc} is currently held as "${item.titleName}" and should be retitled to:\n\n    ${trustLine}\n\nPlease contact ${item.institution} (${item.contact}) to request the change, or let us know and we will prepare the paperwork.` + sig };
+  }
+}
+
+function openFundingLetters(id) {
+  const c = TRUST.clients.find(x => x.id === id);
+  if (!c) return;
+  const letters = [];
+  c.assets.forEach(cat => cat.items.forEach(item => {
+    const st = itemStatus(item);
+    if (st === 'warn' || st === 'nobene') letters.push(fundingLetter(c, cat.category, item));
+  }));
+  document.getElementById('letter-modal-title').textContent = `Funding letters — ${c.name}` + (letters.length ? ` (${letters.length})` : '');
+  document.getElementById('letter-modal-body').innerHTML = letters.length
+    ? letters.map((l, i) => `
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:10px">
+          <div style="min-width:0">
+            <div style="font-weight:600;font-size:13px;color:var(--navy)">${l.title}</div>
+            <div style="font-size:11px;color:var(--gray-400)">To: ${l.to}</div>
+          </div>
+          <button class="btn btn-outline" style="font-size:11px;padding:4px 10px;flex-shrink:0" onclick="copyLetter('letter-${i}')">Copy</button>
+        </div>
+        <textarea id="letter-${i}" readonly style="width:100%;height:200px;padding:10px 12px;border:1px solid var(--gray-200);border-radius:8px;font-size:12px;font-family:var(--font-b);line-height:1.5;color:var(--navy);box-sizing:border-box;resize:vertical;background:var(--offwhite)">${l.body}</textarea>
+      </div>`).join('')
+    : '<div style="padding:20px;color:#15803d;font-weight:600">✓ Nothing to fund — every asset is titled or designated correctly.</div>';
+  document.getElementById('letter-modal').classList.remove('hidden');
+}
+function closeLetterModal() { document.getElementById('letter-modal').classList.add('hidden'); }
+function copyLetter(id) {
+  const ta = document.getElementById(id);
+  if (!ta) return;
+  ta.select();
+  try { navigator.clipboard.writeText(ta.value); } catch (e) { document.execCommand('copy'); }
+  showToast('Letter copied to clipboard');
+}
+
 function togglePortalCat(id, hdr) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -3975,7 +4112,7 @@ function formatM(n) {
 }
 
 // ═══════════ EXPIRY HELPERS ═══════════
-const TODAY = new Date('2026-03-05');
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
 const MONTH_MAP = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
 
 function parsePolicyDate(str) {
@@ -4376,27 +4513,24 @@ function updateTrustSummaryBar(page) {
   const bar = document.getElementById('summary-bar');
   if (!bar) return;
   const totalClients = TRUST.clients.length;
-  const titlingIssues = TRUST.clients.reduce((s, c) => s + c.titlingIssues, 0);
-  const stale = TRUST.clients.filter(c => {
-    const amended = new Date(c.amendedDate || c.trustDate);
-    return (new Date('2026-03-05') - amended) / (1000*60*60*24*365) >= 3;
-  }).length;
+  const titlingIssues = TRUST.clients.reduce((s, c) => s + clientIssues(c).length, 0);
+  const stale = TRUST.clients.filter(c => yearsSince(c.amendedDate || c.trustDate) >= 3).length;
   const avgReadiness = Math.round(TRUST.clients.reduce((s, c) => s + calcTrustReadiness(c), 0) / totalClients);
   bar.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:center;gap:0;width:100%">
       <span class="sb-label-tag" style="color:var(--teal);margin-right:8px">🏛 Harvey Specter · SoCal Coast Trust</span>
       <div class="sb-stat"><div class="sbs-l">Active Clients</div><div class="sbs-v">${totalClients}</div></div>
       <div class="sb-stat"><div class="sbs-l">Avg Readiness</div><div class="sbs-v" style="color:var(--teal)">${avgReadiness}%</div></div>
-      <div class="sb-stat"><div class="sbs-l">Titling Issues</div><div class="sbs-v" style="color:${titlingIssues>0?'#f59e0b':'var(--green)'}">${titlingIssues}</div></div>
-      <div class="sb-stat"><div class="sbs-l">Trusts Overdue</div><div class="sbs-v" style="color:${stale>0?'#f59e0b':'var(--green)'}">${stale}</div></div>
+      <div class="sb-stat"><div class="sbs-l">Funding Issues</div><div class="sbs-v" style="color:${titlingIssues>0?'#f59e0b':'var(--green)'}">${titlingIssues}</div></div>
+      <div class="sb-stat"><div class="sbs-l">Review Overdue</div><div class="sbs-v" style="color:${stale>0?'#f59e0b':'var(--green)'}">${stale}</div></div>
     </div>`;
 }
 
 // ═══════════ COVERAGE SUMMARY (attorney-only) ═══════════
 function renderCoverageSummary() {
   const el = document.getElementById('trust-coverage-summary-content');
-  const flagged = TRUST.clients.filter(c => !c.hasInsurance || (c.lifeInsurance / c.estateValue) < 0.15);
-  const clear = TRUST.clients.filter(c => c.hasInsurance && (c.lifeInsurance / c.estateValue) >= 0.15);
+  const flagged = TRUST.clients.filter(c => coverageAssessment(c).flag);
+  const clear = TRUST.clients.filter(c => !coverageAssessment(c).flag);
 
   el.innerHTML = `
     <div style="max-width:800px">
@@ -4415,10 +4549,7 @@ function renderCoverageSummary() {
           <span style="font-size:11px;color:var(--gray-400)">${flagged.length} of ${TRUST.clients.length} clients</span>
         </div>
         ${flagged.map(c => {
-          const hasIns = c.hasInsurance && c.lifeInsurance > 0;
-          const note = !hasIns
-            ? 'No life insurance policies on file. Estate may lack liquidity for taxes, costs, and distributions.'
-            : 'Life insurance on file may be modest relative to the documented estate. Worth discussing at next review.';
+          const note = coverageAssessment(c).reason;
           return `
           <div style="padding:16px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;gap:16px">
             <div style="display:flex;align-items:center;gap:12px;flex:1">
@@ -4443,12 +4574,12 @@ function renderCoverageSummary() {
             <div class="ca" style="background:${c.color};width:28px;height:28px;font-size:10px;flex-shrink:0">${c.initials}</div>
             <span style="font-size:13px;color:var(--gray-600)">${c.name}</span>
           </div>
-          <span style="font-size:12px;color:#22c55e;font-weight:600">✓ Coverage appears proportionate</span>
+          <span style="font-size:12px;color:#22c55e;font-weight:600">✓ Appears proportionate</span>
         </div>`).join('')}
       </div>` : ''}
 
       <div style="font-size:11px;color:var(--gray-400);line-height:1.6;padding:0 4px">
-        Coverage assessment is based solely on life insurance data documented by clients. Actual estate planning needs depend on many factors beyond what this platform captures. The platform never shares this data with insurance agents or initiates any referral contact.
+        Flags are based on three signals: no insurance documented, estimated federal estate tax above insurance on file, or an estate that is mostly illiquid with modest coverage. Actual needs depend on many factors beyond what this platform captures. The platform never shares this data with insurance agents or initiates any referral contact; any referral is the attorney's call.
       </div>
     </div>
   `;
@@ -4458,7 +4589,7 @@ function renderCoverageSummary() {
 const INTAKE_PROSPECTS = [
   {
     id: 'george', name: 'George Jetson', initials: 'GJ', color: '#3b82f6',
-    email: 'george.jetson@spacely.com', invitedDate: 'Feb 28, 2026',
+    email: 'george.jetson@spacely.com', invitedDate: '2 weeks ago',
     status: 'in-progress', pctComplete: 45,
     completedSections: ['personal', 'real-estate', 'bank'],
     pendingSections: ['investments', 'retirement', 'life-insurance', 'business', 'vehicles'],
@@ -4466,7 +4597,7 @@ const INTAKE_PROSPECTS = [
   },
   {
     id: 'betty', name: 'Michael Scott', initials: 'MS', color: '#0d9488',
-    email: 'michael.scott@dundermifflin.com', invitedDate: 'Mar 3, 2026',
+    email: 'michael.scott@dundermifflin.com', invitedDate: 'today',
     status: 'invited', pctComplete: 0,
     completedSections: [],
     pendingSections: ['personal', 'real-estate', 'bank', 'investments', 'retirement', 'life-insurance', 'business', 'vehicles'],
@@ -4501,8 +4632,8 @@ const GEORGE_DATA = {
 function renderTrustIntake() {
   const el = document.getElementById('trust-intake-content');
   el.innerHTML = `
-    <div style="display:block">
-      <div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start">
+      <div style="min-width:0">
         <div class="card" style="margin-bottom:20px">
           <div class="card-hdr" style="justify-content:space-between">
             <span>Clients In Onboarding</span>
@@ -4678,17 +4809,17 @@ function renderClientPortal() {
   const c = TRUST.clients.find(x => x.id === 'pepper');
   const el = document.getElementById('trust-client-portal-content');
   const totalAssets = c.assets.reduce((s, cat) => s + cat.items.length, 0);
-  const titlingOk = c.assets.reduce((s, cat) => s + cat.items.filter(i => i.titling === 'ok').length, 0);
-  const titlingWarn = c.assets.reduce((s, cat) => s + cat.items.filter(i => i.titling === 'warn').length, 0);
+  const titlingOk = c.assets.reduce((s, cat) => s + cat.items.filter(i => itemStatus(i) === 'ok').length, 0);
+  const titlingWarn = clientIssues(c).length;
 
   el.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start">
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start">
       <div>
         <!-- Welcome banner -->
         <div style="background:linear-gradient(135deg,#0d9488,#0a1f1e);border-radius:12px;padding:22px 26px;color:white;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
           <div>
             <div style="font-family:var(--font-d);font-size:22px;margin-bottom:4px">Good morning, George</div>
-            <div style="font-size:12px;color:rgba(204,251,241,.7)">Lucas Family Revocable Living Trust · Last updated ${c.lastUpdated}</div>
+            <div style="font-size:12px;color:rgba(204,251,241,.7)">${c.trust} · Last updated ${c.lastUpdated}</div>
           </div>
           <div style="text-align:right">
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:rgba(204,251,241,.5);margin-bottom:4px">Estate Readiness</div>
@@ -4727,7 +4858,7 @@ function renderClientPortal() {
                 </div>
                 <div style="display:flex;align-items:center;gap:8px">
                   <div style="display:flex;gap:6px">
-                    ${cat.items.map(item => `<span class="titling-badge ${item.titling==='ok'?'titling-ok':item.titling==='warn'?'titling-warn':'titling-na'}">${item.titling==='ok'?'✓ In Trust':item.titling==='warn'?'⚠ Needs Attention':item.titling==='na'?'Beneficiary':'—'}</span>`).join('')}
+                    ${cat.items.map(item => statusBadge(item)).join('')}
                   </div>
                   <span style="font-size:11px;color:var(--teal);font-weight:600" class="portal-toggle-label">View ▾</span>
                 </div>
@@ -4741,7 +4872,7 @@ function renderClientPortal() {
                   <div style="font-weight:500;font-size:13px">${item.desc}</div>
                   <div style="font-size:12px;color:var(--gray-600)">${item.institution||''}</div>
                   <div style="font-size:12px;color:var(--gray-600)">${item.titleName||''}</div>
-                  <div><span class="titling-badge ${item.titling==='ok'?'titling-ok':item.titling==='warn'?'titling-warn':'titling-na'}">${item.titling==='ok'?'✓ In Trust':item.titling==='warn'?'⚠ Needs Attention':item.titling==='na'?'Beneficiary':'—'}</span></div>
+                  <div>${statusBadge(item)}</div>
                 </div>`).join('')}
               </div>
             </div>`).join('')}
@@ -4753,15 +4884,15 @@ function renderClientPortal() {
         <div class="card" style="border-color:rgba(245,158,11,.3)">
           <div class="card-hdr" style="background:rgba(13,148,136,.06);color:var(--teal)">⚠ Action Items — Assets Not Yet In Trust</div>
           <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-            ${c.assets.flatMap(cat => cat.items.filter(i => i.titling === 'warn').map(item => `
+            ${clientIssues(c).map(item => `
             <div style="padding:12px 14px;border-radius:8px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.2);display:flex;align-items:center;justify-content:space-between">
               <div>
                 <div style="font-weight:600;font-size:13px">${item.desc}</div>
-                <div style="font-size:11px;color:var(--gray-600);margin-top:2px">Currently titled to: ${item.titleName}</div>
+                <div style="font-size:11px;color:var(--gray-600);margin-top:2px">${itemStatus(item)==='nobene' ? 'No beneficiary on file with '+item.institution : 'Currently titled to: '+item.titleName}</div>
               </div>
-              <span style="font-size:11px;color:#f59e0b;font-weight:600">Needs re-titling</span>
-            </div>`)).join('')}
-            <div style="font-size:11px;color:var(--gray-400);line-height:1.5">Your attorney will guide you through re-titling these assets into your trust. No action needed from you right now.</div>
+              <span style="font-size:11px;color:#f59e0b;font-weight:600">${itemStatus(item)==='nobene' ? 'Needs beneficiary form' : 'Needs re-titling'}</span>
+            </div>`).join('')}
+            <div style="font-size:11px;color:var(--gray-400);line-height:1.5">Your attorney will walk you through each of these. Some are a signature; others (a mortgaged property, an LLC interest) take a little more. No action needed from you right now.</div>
           </div>
         </div>` : ''}
       </div>
@@ -4772,9 +4903,9 @@ function renderClientPortal() {
           <div class="card-hdr">Your Trust</div>
           <div class="card-body" style="display:flex;flex-direction:column;gap:8px;font-size:12px">
             <div><div style="color:var(--gray-400);font-size:10px;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px">Trust Name</div><div style="font-weight:600">${c.trust}</div></div>
-            <div><div style="color:var(--gray-400);font-size:10px;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px">Executed</div><div style="font-weight:600">${new Date(c.trustDate).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</div></div>
+            <div><div style="color:var(--gray-400);font-size:10px;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px">Executed</div><div style="font-weight:600">${localDate(c.trustDate).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</div></div>
             <div><div style="color:var(--gray-400);font-size:10px;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px">Attorney</div><div style="font-weight:600">Harvey Specter · SoCal Coast Trust</div></div>
-            <div><div style="color:var(--gray-400);font-size:10px;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px">Last Updated</div><div style="font-weight:600">February 14, 2026</div></div>
+            <div><div style="color:var(--gray-400);font-size:10px;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px">Last Updated</div><div style="font-weight:600">${c.lastUpdated}</div></div>
           </div>
         </div>
         <div class="card">
@@ -4916,14 +5047,13 @@ const TASK_DATA = {
     { id:'r2', done:false, priority:'high',   due:'Mar 8',    client:'Lando Calrissian', tag:'Quote',   text:'Deliver $20M universal life quote package — Lando confirmed meeting for Thursday 2pm' },
     { id:'r3', done:true,  priority:'med',    due:'Mar 4',    client:'Kylo Ren',      tag:'Follow-Up',   text:'Re-engagement call completed — client reconsidering after divorce, scheduling new NA' },
     { id:'r4', done:false, priority:'med',    due:'Mar 11',   client:'Padmé Amidala', tag:'Review',      text:'$25M coverage review — estate plan finalized with Specter, update beneficiary to new trust' },
-    { id:'r5', done:false, priority:'low',    due:'Mar 19',   client:'Sydney Bristow',tag:'Referral',    text:'Trust referral from Harvey — no life insurance on file, $2.2M estate. Schedule intro call.' },
   ],
   harvey: [
-    { id:'h1', done:false, priority:'high',   due:'Today',    client:'George Lucas',  tag:'Document',    text:'Skywalker Ranch deed retitling — needs to be re-recorded in trust name. Follow up with title company.' },
-    { id:'h2', done:false, priority:'high',   due:'Mar 8',    client:'Rachel Green',  tag:'Review',      text:'All 4 assets still in personal name — schedule retitling meeting, trust is fully unfunded' },
-    { id:'h3', done:false, priority:'med',    due:'Mar 10',   client:'Sydney Bristow',tag:'Intake',      text:'New intake in progress — remind Sydney to complete Investment Accounts and Life Insurance sections' },
-    { id:'h4', done:true,  priority:'med',    due:'Mar 3',    client:'Jerry Seinfeld',tag:'Document',    text:'Car collection LLC review completed — confirmed membership interest assigned to trust' },
-    { id:'h5', done:false, priority:'low',    due:'Mar 20',   client:'Coach Taylor',  tag:'Review',      text:'Annual review overdue since 2019 — schedule amendment discussion, estate has grown substantially' },
+    { id:'h1', done:false, priority:'high',   due:'Today',      client:'George Lucas',  tag:'Document',  text:'Skywalker Ranch deed — needs to be re-recorded in the trust name. Follow up with the title company; confirm PCOR exclusion.' },
+    { id:'h2', done:false, priority:'high',   due:'This week',  client:'Rachel Green',  tag:'Review',    text:'Trust is unfunded — every asset still in her personal name, and no pour-over will on file. Schedule a funding meeting.' },
+    { id:'h3', done:false, priority:'high',   due:'This week',  client:'Sydney Bristow',tag:'Document',  text:'No successor trustee named and no beneficiary on the TSP. Draft amendment; send TSP-3 beneficiary form.' },
+    { id:'h4', done:false, priority:'med',    due:'Next week',  client:'Jerry Seinfeld',tag:'Document',  text:'Classic car collection — assignment of Seinfeld LLC membership interest to the trust still unsigned. Send for signature.' },
+    { id:'h5', done:false, priority:'med',    due:'Next week',  client:'Coach Taylor',  tag:'Review',    text:'Never amended since 2018 and the Dillon ranch is still in Eric\'s name. Schedule a review; estate has grown.' },
   ],
 };
 
@@ -5039,7 +5169,7 @@ function renderTrustTasks() {
 // ═══════════ INIT ═══════════
 renderClientView('ironman');
 renderOverview();
-document.getElementById('screen-agent-overview').classList.add('active');
+switchView('trust');
 </script>
 </body>
 </html>
