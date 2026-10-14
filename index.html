@@ -340,7 +340,7 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
   <div class="view-switcher">
     <button class="view-btn active" onclick="switchView('agent')">⚡ Agent View</button>
     <button class="view-btn" onclick="switchView('client')">👤 Client View</button>
-    <button class="view-btn" onclick="switchView('god')" style="border-color:rgba(139,92,246,.5)">👁 God View</button>
+    <button class="view-btn" onclick="switchView('god')" style="border-color:rgba(139,92,246,.5)">📊 Executive View</button>
     <button class="view-btn" onclick="switchView('trust')" style="border-color:rgba(13,148,136,.5)">🏛 Trust View</button>
   </div>
   <div style="display:flex;align-items:center;gap:4px">
@@ -653,25 +653,25 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
 <!-- GOD VIEW SCREENS -->
 <div class="screen" id="screen-god-dashboard">
   <div class="ph"><div><div class="pt">Company Dashboard</div><div class="ps">LI101 OS · Real-time executive overview · 27 locations · 54 agents</div></div>
-    <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">👁 GOD VIEW</div>
+    <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">📊 EXECUTIVE VIEW</div>
   </div>
   <div id="god-dashboard-content"></div>
 </div>
 <div class="screen" id="screen-god-sales">
   <div class="ph"><div><div class="pt">Sales Analytics</div><div class="ps">Company-wide sales performance · charts · location breakdown</div></div>
-    <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">👁 GOD VIEW</div>
+    <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">📊 EXECUTIVE VIEW</div>
   </div>
   <div id="god-sales-content"></div>
 </div>
 <div class="screen" id="screen-god-agentperf">
   <div class="ph"><div><div class="pt">Agent Performance</div><div class="ps">Top performers · bottom performers · turnover · rankings</div></div>
-    <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">👁 GOD VIEW</div>
+    <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">📊 EXECUTIVE VIEW</div>
   </div>
   <div id="god-agents-content"></div>
 </div>
 <div class="screen" id="screen-god-financial">
   <div class="ph"><div><div class="pt">Financial Dashboard</div><div class="ps">Revenue · growth rates · product mix · projections</div></div>
-    <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">👁 GOD VIEW</div>
+    <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">📊 EXECUTIVE VIEW</div>
   </div>
   <div id="god-financial-content"></div>
 </div>
@@ -680,7 +680,7 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
 <div class="screen" id="screen-god-investors">
   <div class="ph">
     <div><div class="pt">Investor Equity</div><div class="ps">Cap table · individual equity positions · vesting status</div></div>
-    <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">👁 GOD VIEW</div>
+    <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">📊 EXECUTIVE VIEW</div>
   </div>
   <div id="god-investors-content"></div>
 </div>
@@ -691,7 +691,7 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
     <div><div class="pt" id="inv-detail-title">Investor Detail</div><div class="ps" id="inv-detail-sub">Equity position · vesting schedule · projected value</div></div>
     <div style="display:flex;gap:8px;align-items:center">
       <button class="btn btn-outline" onclick="godNav('investors')" style="font-size:12px">← All Investors</button>
-      <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">👁 GOD VIEW</div>
+      <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">📊 EXECUTIVE VIEW</div>
     </div>
   </div>
   <div id="god-investor-detail-content"></div>
@@ -2482,7 +2482,7 @@ function updateSummaryBar(context) {
   if(curView==='god') {
     const godPages = { dashboard:'Company Dashboard', sales:'Sales Analytics', agentperf:'Agent Performance', financial:'Financial Dashboard' };
     const pageName = godPages[context] || 'Executive View';
-    html=`<span class="sb-label-tag" style="color:var(--teal)">👁 GOD VIEW · ${pageName}</span>
+    html=`<span class="sb-label-tag" style="color:var(--teal)">📊 EXECUTIVE VIEW · ${pageName}</span>
       <div class="sb-stat"><div class="sbs-l">Locations</div><div class="sbs-v">27</div></div>
       <div class="sb-stat"><div class="sbs-l">Agents</div><div class="sbs-v">54</div></div>
       <div class="sb-stat"><div class="sbs-l">Policies</div><div class="sbs-v">20,000+</div></div>
