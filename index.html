@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LI101 OS + Trust Platform — Demo</title>
+<title>Remain OS — Trust Platform Demo</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -29,10 +29,10 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
 /* NAV */
 .top-nav{background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.25);border-bottom:2px solid #e8715a}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none}
-.logo-mark{width:28px;height:28px;background:var(--coral);border-radius:6px;display:flex;align-items:center;justify-content:center}
-.logo-mark svg{width:15px;height:15px;fill:white}
-.logo-text{font-family:var(--font-d);color:white;font-size:16px}
-.logo-text span{color:var(--coral)}
+.logo-mark{width:34px;height:34px;background:#efe9dc;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.logo-mark img{width:26px;height:auto;display:block;margin-top:2px}
+.logo-text{font-family:var(--font-d);color:white;font-size:17px;letter-spacing:1.5px;text-transform:uppercase}
+.logo-text span{color:var(--coral);letter-spacing:1px}
 .nav-badge{background:rgba(232,113,90,.18);color:var(--coral-light);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:20px;border:1px solid rgba(232,113,90,.3)}
 .view-switcher{display:flex;gap:4px}
 .view-btn{padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);font-family:var(--font-b);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
@@ -334,8 +334,8 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
 <!-- TOP NAV -->
 <nav class="top-nav">
   <a class="logo" href="#">
-    <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
-    <span class="logo-text">LI<span>101</span> OS</span>
+    <div class="logo-mark"><img src="remain-mark.png" alt="Remain"></div>
+    <span class="logo-text">Remain <span>OS</span></span>
   </a>
   <div class="view-switcher">
     <button class="view-btn active" data-view="trust" onclick="switchView('trust')" style="border-color:rgba(13,148,136,.5)">🏛 Trust View</button>
@@ -663,7 +663,7 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
 
 <!-- GOD VIEW SCREENS -->
 <div class="screen" id="screen-god-dashboard">
-  <div class="ph"><div><div class="pt">Company Dashboard</div><div class="ps">LI101 OS · Real-time executive overview · 27 locations · 54 agents</div></div>
+  <div class="ph"><div><div class="pt">Company Dashboard</div><div class="ps">Remain OS · Real-time executive overview · 27 locations · 54 agents</div></div>
     <div style="background:rgba(13,148,136,.12);color:var(--teal);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid rgba(13,148,136,.4)">📊 EXECUTIVE VIEW</div>
   </div>
   <div id="god-dashboard-content"></div>
@@ -710,7 +710,7 @@ body{font-family:var(--font-b);background:var(--offwhite);color:var(--navy);min-
 
 <!-- AGENT: EQUITY TRACKER -->
 <div class="screen" id="screen-agent-equity">
-  <div class="ph"><div><div class="pt" id="eq-title">Equity Tracker</div><div class="ps" id="eq-sub">Your ownership stake in LI101 OS</div></div></div>
+  <div class="ph"><div><div class="pt" id="eq-title">Equity Tracker</div><div class="ps" id="eq-sub">Your ownership stake in Remain OS</div></div></div>
   <div id="eq-content"></div>
 </div>
 
@@ -3233,10 +3233,10 @@ const TRUST = {
           { desc:'401(k) – Lucasfilm Ltd', institution:'Fidelity', titleName:'George Lucas', value:'$100K–$250K', titling:'na', beneficiary:'Amanda Lucas', contact:'HR: (800) 555-7800' },
         ]},
         { category:'Life Insurance', icon:'🛡️', items:[
-          { desc:'Whole Life – Pacific Life', institution:'Pacific Life', titleName:'Lucas Family ILIT', value:'$500,000', titling:'ok', beneficiary:'Lucas Family ILIT', contact:'LI101 · Scott Travasos' },
+          { desc:'Whole Life – Pacific Life', institution:'Pacific Life', titleName:'Lucas Family ILIT', value:'$500,000', titling:'ok', beneficiary:'Lucas Family ILIT', contact:'Remain · Scott Travasos' },
         ]},
         { category:'Business Interests', icon:'🏢', items:[
-          { desc:'Lucasfilm Ltd – Ownership Interest', institution:'Disney/Lucasfilm', titleName:'Lucas Family RLT', value:'$1M+', titling:'ok', contact:'Legal: (415) 555-0100' },
+          { desc:'Lucasfilm Ltd – Ownership Interest', institution:'Disney/Lucasfilm', titleName:'Lucas Family RLT', value:'$1M+', titling:'ok', contact:'Legal: (415) 555-0100', business:{ role:'Minority shareholder', ownerAge:82, employees:'2,000+', comp:'n/a', plan:'Corporate 401(k)' } },
         ]},
         { category:'Vehicles', icon:'🚗', items:[
           { desc:'2023 Tesla Model S', institution:'n/a', titleName:'George Lucas', value:'Under $100K', titling:'warn', contact:'DMV' },
@@ -3289,11 +3289,11 @@ const TRUST = {
           { desc:'Equity Portfolio', institution:'Goldman Sachs', titleName:'Seinfeld Family Trust', value:'$1M+', titling:'ok', contact:'Lisa Wong · (212) 555-0155' },
         ]},
         { category:'Life Insurance', icon:'🛡️', items:[
-          { desc:'Whole Life – Guardian', institution:'Guardian', titleName:'Seinfeld ILIT', value:'$7,500,000', titling:'ok', beneficiary:'Seinfeld ILIT', contact:'LI101 · Rain Maker' },
-          { desc:'Term 20 – MassMutual', institution:'MassMutual', titleName:'Seinfeld ILIT', value:'$10,000,000', titling:'ok', beneficiary:'Seinfeld ILIT', contact:'LI101 · Rain Maker' },
+          { desc:'Whole Life – Guardian', institution:'Guardian', titleName:'Seinfeld ILIT', value:'$7,500,000', titling:'ok', beneficiary:'Seinfeld ILIT', contact:'Remain · Rain Maker' },
+          { desc:'Term 20 – MassMutual', institution:'MassMutual', titleName:'Seinfeld ILIT', value:'$10,000,000', titling:'ok', beneficiary:'Seinfeld ILIT', contact:'Remain · Rain Maker' },
         ]},
         { category:'Business Interests', icon:'🏢', items:[
-          { desc:'Seinfeld Productions LLC', institution:'n/a', titleName:'Seinfeld Family Trust', value:'$1M+', titling:'ok', contact:'Legal: (310) 555-0200' },
+          { desc:'Seinfeld Productions LLC', institution:'n/a', titleName:'Seinfeld Family Trust', value:'$1M+', titling:'ok', contact:'Legal: (310) 555-0200', business:{ role:'Owner-operator', ownerAge:72, employees:3, comp:'$1M+', plan:'None' } },
         ]},
         { category:'Retirement Accounts', icon:'🏦', items:[
           { desc:'Solo 401(k)', institution:'Fidelity', titleName:'Jerry Seinfeld', value:'$1M+', titling:'na', beneficiary:'Jessica Seinfeld', contact:'(800) 343-3548' },
@@ -3323,8 +3323,8 @@ const TRUST = {
           { desc:'Brokerage', institution:'Charles Schwab', titleName:'Taylor Family RLT', value:'$250K–$1M', titling:'ok', contact:'Dan Park · (512) 555-0188' },
         ]},
         { category:'Life Insurance', icon:'🛡️', items:[
-          { desc:'Whole Life – New York Life', institution:'New York Life', titleName:'Taylor ILIT', value:'$6,000,000', titling:'ok', beneficiary:'Taylor ILIT', contact:'LI101 · Rain Maker' },
-          { desc:'Universal Life – Pacific Life', institution:'Pacific Life', titleName:'Taylor ILIT', value:'$10,000,000', titling:'ok', beneficiary:'Taylor ILIT', contact:'LI101 · Rain Maker' },
+          { desc:'Whole Life – New York Life', institution:'New York Life', titleName:'Taylor ILIT', value:'$6,000,000', titling:'ok', beneficiary:'Taylor ILIT', contact:'Remain · Rain Maker' },
+          { desc:'Universal Life – Pacific Life', institution:'Pacific Life', titleName:'Taylor ILIT', value:'$10,000,000', titling:'ok', beneficiary:'Taylor ILIT', contact:'Remain · Rain Maker' },
         ]},
         { category:'Retirement Accounts', icon:'🏦', items:[
           { desc:'State Pension – Texas Teachers', institution:'TRS of Texas', titleName:'Eric Taylor', value:'$1M+', titling:'na', beneficiary:'Tami Taylor', contact:'(800) 223-8778' },
@@ -3534,6 +3534,21 @@ function coverageAssessment(c) {
   return { flag:false, reason:'Insurance on file appears proportionate to the documented estate and estimated tax.' };
 }
 
+// ── Qualified-plan screening (attorney reference only) ──
+// Flags an owner-operator aged 50+ with few W-2 employees, high compensation and no defined benefit plan:
+// the profile where a fully insured defined benefit plan under IRC §412(e)(3) can produce a large deductible contribution.
+function qualifiedPlanNote(c) {
+  const hits = [];
+  c.assets.forEach(cat => cat.items.forEach(i => {
+    const b = i.business; if (!b) return;
+    const emp = typeof b.employees === 'number' ? b.employees : NaN;
+    const highComp = /\$1M|\$[5-9]\d\dK|\$[4-9]\d\d,/.test(String(b.comp)) || parseValue(b.comp) >= 400000;
+    const noDB = !/defined benefit|cash balance|412/i.test(String(b.plan));
+    if (/owner/i.test(b.role) && b.ownerAge >= 50 && b.ownerAge <= 75 && emp <= 10 && highComp && noDB) hits.push({ item:i, b });
+  }));
+  return hits;
+}
+
 function renderTrustDashboard() {
   const totalClients = TRUST.clients.length;
   const titlingIssues = TRUST.clients.reduce((s, c) => s + clientIssues(c).length, 0);
@@ -3671,6 +3686,14 @@ function renderTrustDashboard() {
       </div>
       <a onclick="trustNav('coverage-summary')" style="font-size:11px;font-weight:600;color:var(--teal);cursor:pointer;white-space:nowrap;text-decoration:none">View summary →</a>
     </div>
+    ${(() => { const n = TRUST.clients.filter(c => qualifiedPlanNote(c).length).length; return n ? `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 18px;margin-top:10px;border-radius:8px;border:1px solid rgba(15,39,68,.2);background:rgba(15,39,68,.02);gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:15px">🏢</span>
+        <span style="font-size:12px;color:var(--gray-600)"><strong style="color:var(--navy)">${n}</strong> business-owner client${n!==1?'s':''} fit${n===1?'s':''} the profile for a fully insured defined benefit plan (§412(e)(3))</span>
+      </div>
+      <a onclick="selectTrustClient('${TRUST.clients.find(c => qualifiedPlanNote(c).length).id}')" style="font-size:11px;font-weight:600;color:var(--navy);cursor:pointer;white-space:nowrap;text-decoration:none">View estate →</a>
+    </div>` : ''; })()}
   `;
 }
 
@@ -3817,6 +3840,19 @@ function renderTrustClientDetail(id) {
           <div style="font-size:12px;color:#15803d;font-weight:600">✓ Coverage Note</div>
           <div style="font-size:12px;color:var(--gray-600);margin-top:4px">${cov.reason}</div>
         </div>`}
+
+        <!-- QUALIFIED PLAN NOTE — attorney-only -->
+        ${qualifiedPlanNote(c).map(({item, b}) => `
+        <div style="margin-top:12px;border:1.5px solid rgba(15,39,68,.35);border-radius:10px;padding:16px 20px;background:rgba(15,39,68,.025)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--navy)">Qualified Plan Note — Attorney Reference Only</div>
+            <span style="font-size:10px;color:var(--gray-400)">🔒 Not visible to agents</span>
+          </div>
+          <div style="font-size:13px;color:var(--gray-600);line-height:1.6">
+            <strong style="color:var(--navy)">${item.desc}</strong> — ${b.role.toLowerCase()}, age ${b.ownerAge}, ${b.employees} W-2 employee${b.employees===1?'':'s'}, compensation ${b.comp}, retirement plan: ${b.plan.toLowerCase()}.
+            This is the profile where a fully insured defined benefit plan under IRC §412(e)(3) can support a deductible contribution well above 401(k) and SEP limits, with a guaranteed benefit and no market risk to the sponsor. Worth raising with the client's CPA before year-end; the plan must be adopted within the tax year it is deducted.
+          </div>
+        </div>`).join('')}
       </div>
 
       <!-- RIGHT PANEL -->
@@ -4232,7 +4268,7 @@ const INVESTORS = [
     exitScenarios: [
       { label: '$472M (10-Yr Vision)', value: 6608000, multiple: '6.6x' },
     ],
-    notes: 'Tech investor. Background in enterprise SaaS and fintech. Interested in LI101 OS as standalone platform.'
+    notes: 'Tech investor. Background in enterprise SaaS and fintech. Interested in Remain OS as standalone platform.'
   },
   {
     id: 'founders', name: 'Founders / Mgmt', initials: 'FD', color: '#0D2137',
@@ -4612,7 +4648,7 @@ const Q_SECTIONS = [
   { id: 'investments',    icon: '📈', label: 'Investment Accounts',    desc: 'Brokerage, stocks, bonds, mutual funds, annuities' },
   { id: 'retirement',     icon: '🏦', label: 'Retirement Accounts',    desc: '401(k), IRA, pension, TSP — beneficiary designations' },
   { id: 'life-insurance', icon: '🛡️', label: 'Life Insurance',         desc: 'All in-force policies — carrier, type, death benefit, owner' },
-  { id: 'business',       icon: '🏢', label: 'Business Interests',     desc: 'Ownership stakes, LLCs, partnerships, buy-sell agreements' },
+  { id: 'business',       icon: '🏢', label: 'Business Interests',     desc: 'Ownership stakes, LLCs, partnerships, buy-sell agreements, retirement plans' },
   { id: 'vehicles',       icon: '🚗', label: 'Vehicles & Other Assets', desc: 'Cars, boats, collectibles, art, jewelry' },
 ];
 
@@ -4770,7 +4806,7 @@ function renderQuestionnaire() {
           'investments':    [['Institution','e.g. Fidelity, Schwab, Vanguard'],['Account Type','Brokerage / Annuity / Bonds'],['Current Title / Owner','Who owns this account?'],['Advisor Contact','Name and phone']],
           'retirement':     [['Account Type','401(k) / IRA / Pension / TSP'],['Institution','e.g. Fidelity, Vanguard, TRS'],['Primary Beneficiary','Beneficiary on file'],['Employer / Plan Name','If employer-sponsored']],
           'real-estate':    [['Property Description','e.g. Primary Residence, Vacation Home'],['Current Title / Owner Name','Who legally owns this?'],['Estimated Value','Choose a range'],['Contact / Realtor','Name and phone']],
-          'business':       [['Business Name','Legal entity name'],['Entity Type','LLC / S-Corp / Partnership'],['Ownership %','Your ownership stake'],['Buy-Sell Agreement','Yes / No / In progress']],
+          'business':       [['Business Name','Legal entity name'],['Entity Type','LLC / S-Corp / Partnership'],['Ownership %','Your ownership stake'],['Buy-Sell Agreement','Yes / No / In progress'],['Your Role & Age','e.g. Owner-operator, 58'],['W-2 Employees','Number, not counting owners'],['Owner Compensation','Approximate annual W-2 or K-1 income'],['Company Retirement Plan','None / SEP / 401(k) / Cash balance / Defined benefit']],
           'vehicles':       [['Description','Year, make, model'],['Registered Owner','Name on title'],['Estimated Value','Approximate current value'],['Loan / Lien','Outstanding loan yes/no']],
         };
         const fields = sectionFields[s.id] || [];

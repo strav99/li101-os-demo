@@ -1,4 +1,4 @@
-# LI101 OS + Trust Platform — demo
+# Remain OS — Trust Platform demo
 
 Single-file static demo (`index.html`). Opens in the attorney-facing **Trust View** by default; Agent, Client and Executive views are in the top bar.
 
